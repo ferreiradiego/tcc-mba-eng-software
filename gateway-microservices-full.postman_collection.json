@@ -1,0 +1,352 @@
+{
+  "info": {
+    "_postman_id": "full-microservices-collection-2025",
+    "name": "Gateway + Microservices API (Auth, Task, TimeLog, Scrum Ceremony)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Fluxo Principal",
+          "item": [
+            {
+              "name": "Register User",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Diego Teste\",\n  \"email\": \"diego@example.com\",\n  \"password\": \"12345678\"\n}"
+                },
+                "url": { "raw": "http://localhost:3000/auth/register", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["auth", "register"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Login User",
+              "event": [{ "listen": "test", "script": { "exec": ["if (pm.response.code === 200) {", "  var json = pm.response.json();", "  pm.collectionVariables.set('token', json.token);", "  pm.collectionVariables.set('refreshToken', json.refreshToken);", "  pm.collectionVariables.set('userId', json.user.id);", "}"], "type": "text/javascript" } }],
+              "request": {
+                "method": "POST",
+                "header": [ { "key": "Content-Type", "value": "application/json" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"email\": \"diego@example.com\",\n  \"password\": \"12345678\"\n}" },
+                "url": { "raw": "http://localhost:3000/auth/login", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["auth", "login"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Refresh Token",
+              "request": {
+                "method": "POST",
+                "header": [ { "key": "Content-Type", "value": "application/json" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}" },
+                "url": { "raw": "http://localhost:3000/auth/refresh", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["auth", "refresh"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Me (User Info)",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "http://localhost:3000/auth/me", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["auth", "me"] }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Exemplos de Erro",
+          "item": [
+            {
+              "name": "Register User - Email já cadastrado",
+              "request": {
+                "method": "POST",
+                "header": [ { "key": "Content-Type", "value": "application/json" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"name\": \"Diego Teste\",\n  \"email\": \"diego@example.com\",\n  \"password\": \"12345678\"\n}" },
+                "url": { "raw": "http://localhost:3000/auth/register", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["auth", "register"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Login User - Senha incorreta",
+              "request": {
+                "method": "POST",
+                "header": [ { "key": "Content-Type", "value": "application/json" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"email\": \"diego@example.com\",\n  \"password\": \"senhaerrada\"\n}" },
+                "url": { "raw": "http://localhost:3000/auth/login", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["auth", "login"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Me - Token inválido",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer tokeninvalido" } ],
+                "url": { "raw": "http://localhost:3000/auth/me", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["auth", "me"] }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Task",
+      "item": [
+        {
+          "name": "CRUD",
+          "item": [
+            {
+              "name": "Criar Task",
+              "event": [{ "listen": "test", "script": { "exec": ["if (pm.response.code === 201) {", "  var json = pm.response.json();", "  pm.collectionVariables.set('taskId', json.id);", "}"], "type": "text/javascript" } }],
+              "request": {
+                "method": "POST",
+                "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"title\": \"Minha Primeira Task\",\n  \"description\": \"Descrição da task\",\n  \"status\": \"todo\",\n  \"priority\": \"medium\",\n  \"category\": \"Estudo\"\n}" },
+                "url": { "raw": "http://localhost:3000/tasks", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["tasks"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Listar Tasks do Usuário",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "http://localhost:3000/tasks?userId={{userId}}", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["tasks"], "query": [ { "key": "userId", "value": "{{userId}}" } ] }
+              },
+              "response": []
+            },
+            {
+              "name": "Buscar Task por ID",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "http://localhost:3000/tasks/{{taskId}}", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["tasks", "{{taskId}}"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Atualizar Task",
+              "request": {
+                "method": "PUT",
+                "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"title\": \"Task Atualizada\",\n  \"status\": \"in_progress\"\n}" },
+                "url": { "raw": "http://localhost:3000/tasks/{{taskId}}", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["tasks", "{{taskId}}"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Deletar Task",
+              "request": {
+                "method": "DELETE",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "http://localhost:3000/tasks/{{taskId}}", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["tasks", "{{taskId}}"] }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Exemplos de Erro",
+          "item": [
+            {
+              "name": "Criar Task - Campos obrigatórios ausentes",
+              "request": {
+                "method": "POST",
+                "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"title\": \"\"\n}" },
+                "url": { "raw": "http://localhost:3000/tasks", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["tasks"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Buscar Task por ID - ID inexistente",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "http://localhost:3000/tasks/invalid-id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["tasks", "invalid-id"] }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TimeLog",
+      "item": [
+        {
+          "name": "CRUD",
+          "item": [
+            {
+              "name": "Criar TimeLog",
+              "event": [{ "listen": "test", "script": { "exec": ["if (pm.response.code === 201) {", "  var json = pm.response.json();", "  pm.collectionVariables.set('timelogId', json.id);", "}"], "type": "text/javascript" } }],
+              "request": {
+                "method": "POST",
+                "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"taskId\": \"{{taskId}}\",\n  \"startTime\": \"2025-06-07T10:00:00.000Z\",\n  \"status\": \"running\"\n}" },
+                "url": { "raw": "http://localhost:3000/timelogs", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["timelogs"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Listar TimeLogs do Usuário",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "http://localhost:3000/timelogs?userId={{userId}}", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["timelogs"], "query": [ { "key": "userId", "value": "{{userId}}" } ] }
+              },
+              "response": []
+            },
+            {
+              "name": "Buscar TimeLog por ID",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "http://localhost:3000/timelogs/{{timelogId}}", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["timelogs", "{{timelogId}}"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Atualizar TimeLog",
+              "request": {
+                "method": "PUT",
+                "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"endTime\": \"2025-06-07T12:00:00.000Z\",\n  \"status\": \"stopped\"\n}" },
+                "url": { "raw": "http://localhost:3000/timelogs/{{timelogId}}", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["timelogs", "{{timelogId}}"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Deletar TimeLog",
+              "request": {
+                "method": "DELETE",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "http://localhost:3000/timelogs/{{timelogId}}", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["timelogs", "{{timelogId}}"] }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Exemplos de Erro",
+          "item": [
+            {
+              "name": "Criar TimeLog - Campos obrigatórios ausentes",
+              "request": {
+                "method": "POST",
+                "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"userId\": \"\",\n  \"taskId\": \"\",\n  \"startTime\": \"\",\n  \"status\": \"\"\n}" },
+                "url": { "raw": "http://localhost:3000/timelogs", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["timelogs"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Buscar TimeLog por ID - ID inexistente",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "http://localhost:3000/timelogs/invalid-id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["timelogs", "invalid-id"] }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Scrum Ceremony",
+      "item": [
+        {
+          "name": "CRUD",
+          "item": [
+            {
+              "name": "Criar Cerimônia",
+              "event": [{ "listen": "test", "script": { "exec": ["if (pm.response.code === 201) {", "  var json = pm.response.json();", "  pm.collectionVariables.set('ceremonyId', json.id);", "}"], "type": "text/javascript" } }],
+              "request": {
+                "method": "POST",
+                "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"type\": \"DAILY\",\n  \"scheduledAt\": \"2025-06-08T10:00:00.000Z\",\n  \"startTime\": \"2025-06-08T10:00:00.000Z\",\n  \"endTime\": \"2025-06-08T10:15:00.000Z\",\n  \"participants\": [\"{{userId}}\"],\n  \"timeLogs\": []\n}" },
+                "url": { "raw": "http://localhost:3000/ceremonies", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["ceremonies"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Listar Cerimônias",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "http://localhost:3000/ceremonies", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["ceremonies"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Buscar Cerimônia por ID",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "http://localhost:3000/ceremonies/{{ceremonyId}}", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["ceremonies", "{{ceremonyId}}"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Atualizar Cerimônia",
+              "request": {
+                "method": "PUT",
+                "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"type\": \"REVIEW\",\n  \"startTime\": \"2025-06-08T11:00:00.000Z\",\n  \"endTime\": \"2025-06-08T11:30:00.000Z\"\n}" },
+                "url": { "raw": "http://localhost:3000/ceremonies/{{ceremonyId}}", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["ceremonies", "{{ceremonyId}}"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Deletar Cerimônia",
+              "request": {
+                "method": "DELETE",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "http://localhost:3000/ceremonies/{{ceremonyId}}", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["ceremonies", "{{ceremonyId}}"] }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Exemplos de Erro",
+          "item": [
+            {
+              "name": "Criar Cerimônia - Campos obrigatórios ausentes",
+              "request": {
+                "method": "POST",
+                "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"type\": \"\",\n  \"scheduledAt\": \"\",\n  \"startTime\": \"\",\n  \"endTime\": \"\",\n  \"participants\": [],\n  \"timeLogs\": []\n}" },
+                "url": { "raw": "http://localhost:3000/ceremonies", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["ceremonies"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Buscar Cerimônia por ID - ID inexistente",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "http://localhost:3000/ceremonies/invalid-id", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["ceremonies", "invalid-id"] }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "token", "value": "" },
+    { "key": "refreshToken", "value": "" },
+    { "key": "userId", "value": "" },
+    { "key": "taskId", "value": "" },
+    { "key": "timelogId", "value": "" },
+    { "key": "ceremonyId", "value": "" }
+  ]
+}

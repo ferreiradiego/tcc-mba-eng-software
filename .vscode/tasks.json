@@ -1,0 +1,68 @@
+// tasks.json para rodar todos os microserviços em terminais integrados do VS Code
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "dev:auth-service",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": { "cwd": "${workspaceFolder}/api/microservices/auth-service" },
+      "problemMatcher": []
+    },
+    {
+      "label": "dev:task-service",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": { "cwd": "${workspaceFolder}/api/microservices/task-service" },
+      "problemMatcher": []
+    },
+    {
+      "label": "dev:timelog-service",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": { "cwd": "${workspaceFolder}/api/microservices/timelog-service" },
+      "problemMatcher": []
+    },
+    {
+      "label": "dev:scrum-service",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": { "cwd": "${workspaceFolder}/api/microservices/scrum-service" },
+      "problemMatcher": []
+    },
+    {
+      "label": "dev:report-service",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": { "cwd": "${workspaceFolder}/api/microservices/report-service" },
+      "problemMatcher": []
+    },
+    {
+      "label": "dev:notification-service",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": { "cwd": "${workspaceFolder}/api/microservices/notification-service" },
+      "problemMatcher": []
+    },
+    {
+      "label": "dev:gateway",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": { "cwd": "${workspaceFolder}/api/microservices/gateway" },
+      "problemMatcher": []
+    },
+    {
+      "label": "dev:all-microservices",
+      "dependsOn": [
+        "dev:auth-service",
+        "dev:task-service",
+        "dev:timelog-service",
+        "dev:scrum-service",
+        "dev:report-service",
+        "dev:notification-service",
+        "dev:gateway"
+      ],
+      "dependsOrder": "parallel"
+    }
+  ]
+}

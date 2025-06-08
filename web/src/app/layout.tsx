@@ -1,7 +1,8 @@
+import { Sidebar } from "@/components/sidebar";
+import { ReactQueryProvider } from "@/lib/react-query-provider";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { ReactQueryProvider } from "@/lib/react-query-provider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,7 +30,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ReactQueryProvider>{children}</ReactQueryProvider>
+        <ReactQueryProvider>
+          <div className="flex h-screen w-screen overflow-hidden">
+            <Sidebar />
+            <main className="flex-1 h-screen overflow-auto bg-background">
+              {children}
+            </main>
+          </div>
+        </ReactQueryProvider>
       </body>
     </html>
   );

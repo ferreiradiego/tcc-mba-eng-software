@@ -9,7 +9,14 @@ import { Clock, PauseCircle, StopCircle, FilePen, Trash2 } from "lucide-react";
 
 export default function TimeLogsList() {
   const { timelogs, loading, error, deleteTimeLog } = useTimeLogs();
+  // Agrupa timelogs por tarefa
   const { tasks } = useTasks();
+  const grouped = tasks
+    .map((task) => ({
+      task,
+      timelogs: timelogs.filter((t) => t.taskId === task.id),
+    }))
+    .filter((g) => g.timelogs.length > 0);
   const [editingTimeLog, setEditingTimeLog] = useState<TimeLog | null>(null);
   const statusMap: Record<string, string> = {
     running: "Em andamento",
@@ -37,68 +44,72 @@ export default function TimeLogsList() {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col gap-4">
-          {timelogs.map((timelog) => {
-            const task = tasks.find((t) => t.id === timelog.taskId);
-            let statusIcon = <Clock className="text-blue-500" />;
-            let statusColor = "text-blue-600";
-            if (timelog.status === "paused") {
-              statusIcon = <PauseCircle className="text-yellow-500" />;
-              statusColor = "text-yellow-600";
-            } else if (timelog.status === "stopped") {
-              statusIcon = <StopCircle className="text-red-500" />;
-              statusColor = "text-red-600";
-            }
-            return (
-              <div
-                key={timelog.id}
-                className="flex items-center gap-4 bg-card rounded-lg p-4 shadow-sm border"
-              >
-                <div>{statusIcon}</div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium truncate">
-                    {task ? task.title : (
-                      <span className="italic text-muted-foreground">(Tarefa não encontrada)</span>
-                    )}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    Início: {timelog.startTime ? new Date(timelog.startTime).toLocaleString() : "-"}
-                    {timelog.endTime && (
-                      <>
-                        {" | Fim: "}
-                        {new Date(timelog.endTime).toLocaleString()}
-                      </>
-                    )}
-                  </div>
-                  <div className="text-xs mt-1">
-                    <span className={statusColor + " font-semibold"}>{statusMap[timelog.status] || timelog.status}</span>
-                    {timelog.duration && (
-                      <span className="ml-2 text-muted-foreground">Duração: {timelog.duration} min</span>
-                    )}
-                  </div>
+        <div className="flex flex-col gap-8">
+          {grouped.length > 0 ? (
+            grouped.map(({ task, timelogs }) => (
+              <div key={task.id}>
+                <div className="font-bold text-lg mb-2 flex items-center gap-2">
+                  <span>{task.title}</span>
                 </div>
-                <div className="flex flex-col gap-2">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setEditingTimeLog(timelog)}
-                    aria-label="Editar"
-                  >
-                    <FilePen />
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    onClick={() => deleteTimeLog(timelog.id)}
-                    aria-label="Excluir"
-                  >
-                    <Trash2 />
-                  </Button>
+                <div className="flex flex-col gap-4">
+                  {timelogs.map((timelog) => {
+                    let statusIcon = <Clock className="text-blue-500" />;
+                    let statusColor = "text-blue-600";
+                    if (timelog.status === "paused") {
+                      statusIcon = <PauseCircle className="text-yellow-500" />;
+                      statusColor = "text-yellow-600";
+                    } else if (timelog.status === "stopped") {
+                      statusIcon = <StopCircle className="text-red-500" />;
+                      statusColor = "text-red-600";
+                    }
+                    return (
+                      <div
+                        key={timelog.id}
+                        className="flex items-center gap-4 bg-card rounded-lg p-4 shadow-sm border"
+                      >
+                        <div>{statusIcon}</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium truncate">
+                            <span className={statusColor + " font-semibold"}>{statusMap[timelog.status] || timelog.status}</span>
+                            {timelog.duration && (
+                              <span className="ml-2 text-muted-foreground">Duração: {timelog.duration} min</span>
+                            )}
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            Início: {timelog.startTime ? new Date(timelog.startTime).toLocaleString() : "-"}
+                            {timelog.endTime && (
+                              <>
+                                {" | Fim: "}
+                                {new Date(timelog.endTime).toLocaleString()}
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setEditingTimeLog(timelog)}
+                            aria-label="Editar"
+                          >
+                            <FilePen />
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            onClick={() => deleteTimeLog(timelog.id)}
+                            aria-label="Excluir"
+                          >
+                            <Trash2 />
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-            );
-          })}
-          {timelogs.length === 0 && (
+            ))
+          ) : (
             <div className="text-muted-foreground text-center py-8">
               Nenhum registro encontrado.
             </div>

@@ -15,7 +15,7 @@ import {
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { TimeLog, useTimeLogs } from "@/hooks/use-timelogs";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, PlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -25,7 +25,7 @@ const TimeLogSchema = z.object({
   taskId: z.string().uuid({ message: "Selecione uma tarefa" }),
   startTime: z.coerce.date(),
   endTime: z.coerce.date().optional(),
-  duration: z.number().int().positive().optional(),
+  duration: z.coerce.number().int().positive().optional(),
   status: z.enum(["running", "paused", "stopped"]),
 });
 type TimeLogForm = z.infer<typeof TimeLogSchema>;
@@ -47,7 +47,9 @@ export function TimeLogDialogForm({
     defaultValues: timelog
       ? {
           ...timelog,
-          startTime: timelog.startTime ? new Date(timelog.startTime) : undefined,
+          startTime: timelog.startTime
+            ? new Date(timelog.startTime)
+            : undefined,
           endTime: timelog.endTime ? new Date(timelog.endTime) : undefined,
         }
       : {
@@ -91,10 +93,19 @@ export function TimeLogDialogForm({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>{!isEdit && <Button>Novo Registro</Button>}</DialogTrigger>
+      <DialogTrigger asChild>
+        {!isEdit && (
+          <Button className="bg-green-600 hover:bg-green-700 text-white rounded-full">
+            <PlusIcon />
+            Adicionar
+          </Button>
+        )}
+      </DialogTrigger>{" "}
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{isEdit ? "Editar Registro" : "Novo Registro de Tempo"}</DialogTitle>
+          <DialogTitle>
+            {isEdit ? "Editar Registro" : "Novo Registro de Tempo"}
+          </DialogTitle>
         </DialogHeader>
         {methods.formState.isSubmitting ? (
           <div className="py-8 text-center text-muted-foreground">
@@ -102,7 +113,10 @@ export function TimeLogDialogForm({
           </div>
         ) : (
           <FormProvider {...methods}>
-            <form className="space-y-4" onSubmit={methods.handleSubmit(onSubmit)}>
+            <form
+              className="space-y-4"
+              onSubmit={methods.handleSubmit(onSubmit)}
+            >
               <ControlledSelect
                 name="taskId"
                 label="Tarefa"
@@ -112,7 +126,11 @@ export function TimeLogDialogForm({
               />
               <ControlledDatePicker name="startTime" label="Início" required />
               <ControlledDatePicker name="endTime" label="Fim" />
-              <ControlledInput name="duration" label="Duração (min)" type="number" />
+              <ControlledInput
+                name="duration"
+                label="Duração (min)"
+                type="number"
+              />
               <ControlledSelect
                 name="status"
                 label="Status"
@@ -123,8 +141,16 @@ export function TimeLogDialogForm({
                   { value: "stopped", label: "Finalizado" },
                 ]}
               />
-              <Button type="submit" disabled={methods.formState.isSubmitting} className="w-full">
-                {methods.formState.isSubmitting ? <Loader2 className="animate-spin" /> : "Salvar"}
+              <Button
+                type="submit"
+                disabled={methods.formState.isSubmitting}
+                className="w-full"
+              >
+                {methods.formState.isSubmitting ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  "Salvar"
+                )}
               </Button>
             </form>
           </FormProvider>

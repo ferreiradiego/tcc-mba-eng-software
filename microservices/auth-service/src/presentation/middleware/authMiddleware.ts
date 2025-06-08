@@ -1,5 +1,5 @@
+import { verifyToken } from "@infrastructure/auth/jwt";
 import { NextFunction, Request, Response } from "express";
-import { verifyToken } from "../../infrastructure/auth/jwt";
 
 export function authMiddleware(
   req: Request,

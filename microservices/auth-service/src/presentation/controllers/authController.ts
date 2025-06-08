@@ -1,10 +1,7 @@
-import { Request, Response } from "express";
+import { generateRefreshToken, generateToken } from "@infrastructure/auth/jwt";
+import { PrismaUserRepository } from "@infrastructure/repositories/PrismaUserRepository";
 import bcrypt from "bcrypt";
-import { PrismaUserRepository } from "../../infrastructure/repositories/PrismaUserRepository";
-import {
-  generateToken,
-  generateRefreshToken,
-} from "../../infrastructure/auth/jwt";
+import { Request, Response } from "express";
 import { RegisterUserSchema } from "../../application/usecases/RegisterUser";
 
 const userRepository = new PrismaUserRepository();

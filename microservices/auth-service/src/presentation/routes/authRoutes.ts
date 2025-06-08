@@ -4,10 +4,10 @@ import {
   loginController,
   refreshController,
   meController,
-} from "../controllers/authController";
-import { authMiddleware } from "../middleware/authMiddleware";
-import { validateBody } from "../middleware/validate";
-import { RegisterUserSchema } from "../../application/usecases/RegisterUser";
+} from "@presentation/controllers/authController";
+import { authMiddleware } from "@presentation/middleware/authMiddleware";
+import { validateBody } from "@presentation/middleware/validate";
+import { RegisterUserSchema } from "@application/usecases/RegisterUser";
 
 const router = Router();
 

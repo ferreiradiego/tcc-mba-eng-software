@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-import authRoutes from "./presentation/routes/authRoutes";
+import authRoutes from "@presentation/routes/authRoutes";
 
 dotenv.config();
 

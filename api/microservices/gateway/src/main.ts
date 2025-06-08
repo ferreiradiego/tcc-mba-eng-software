@@ -1,11 +1,19 @@
-import express from "express";
+import cors from "cors";
 import dotenv from "dotenv";
+import express from "express";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import jwt from "jsonwebtoken";
 
 dotenv.config();
 
 const app = express();
+
+app.use(
+  cors({
+    origin: ["http://localhost:3007"],
+    credentials: true,
+  })
+);
 
 app.use((req, res, next) => {
   if (req.path.startsWith("/auth")) return next();

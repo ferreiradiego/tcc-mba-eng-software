@@ -1,0 +1,107 @@
+"use client";
+
+import { CeremonyDialogForm } from "@/components/ceremony-dialog-form";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Ceremony, useCeremonies } from "@/hooks/use-ceremonies";
+import { CalendarCheck2, Clock, FilePen, Trash2, Users } from "lucide-react";
+import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+
+export default function CeremoniesList() {
+  const { ceremonies, loading, error, deleteCeremony } = useCeremonies();
+  const [editingCeremony, setEditingCeremony] = useState<Ceremony | null>(null);
+
+  const typeMap: Record<string, { label: string; icon: JSX.Element; color: string }> = {
+    DAILY: { label: "Daily", icon: <Users />, color: "text-blue-600" },
+    PLANNING: { label: "Planning", icon: <CalendarCheck2 />, color: "text-green-600" },
+    REVIEW: { label: "Review", icon: <Clock />, color: "text-yellow-600" },
+    RETROSPECTIVE: { label: "Retrospective", icon: <Clock />, color: "text-purple-600" },
+  };
+
+  return (
+    <>
+      {loading ? (
+        <div className="flex flex-col gap-4">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} className="flex items-center gap-4 p-4 border">
+              <Skeleton className="h-12 w-12 rounded-full" />
+              <div className="flex-1 min-w-0 space-y-2">
+                <Skeleton className="h-4 w-1/2 rounded" />
+                <Skeleton className="h-3 w-1/3 rounded" />
+                <Skeleton className="h-3 w-1/4 rounded" />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Skeleton className="h-8 w-8 rounded" />
+                <Skeleton className="h-8 w-8 rounded" />
+              </div>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col gap-4">
+          {ceremonies.length > 0 ? (
+            ceremonies.map((ceremony) => {
+              const type = typeMap[ceremony.type] || { label: ceremony.type, icon: <Clock />, color: "text-muted-foreground" };
+              return (
+                <Card key={ceremony.id} className="flex items-center gap-4 p-4 border shadow-sm">
+                  <div className={`rounded-full bg-muted p-3 ${type.color}`}>{type.icon}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-lg flex items-center gap-2">
+                      <span>{type.label}</span>
+                      <span className="text-xs text-muted-foreground font-normal">{ceremony.duration ? `${ceremony.duration} min` : null}</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Agendada: {ceremony.scheduledAt ? new Date(ceremony.scheduledAt).toLocaleString() : "-"}
+                      {ceremony.startTime && (
+                        <>
+                          {" | Início: "}
+                          {new Date(ceremony.startTime).toLocaleString()}
+                        </>
+                      )}
+                      {ceremony.endTime && (
+                        <>
+                          {" | Fim: "}
+                          {new Date(ceremony.endTime).toLocaleString()}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setEditingCeremony(ceremony)}
+                      aria-label="Editar"
+                    >
+                      <FilePen />
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      onClick={() => deleteCeremony(ceremony.id)}
+                      aria-label="Excluir"
+                    >
+                      <Trash2 />
+                    </Button>
+                  </div>
+                </Card>
+              );
+            })
+          ) : (
+            <div className="text-muted-foreground text-center py-8">
+              Nenhuma cerimônia encontrada.
+            </div>
+          )}
+        </div>
+      )}
+      {editingCeremony && (
+        <CeremonyDialogForm
+          ceremony={editingCeremony}
+          onClose={() => setEditingCeremony(null)}
+        />
+      )}
+      {error && <div className="text-red-500 text-sm text-center">{error}</div>}
+    </>
+  );
+}

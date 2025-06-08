@@ -16,13 +16,25 @@ export async function getCeremony(req: Request, res: Response) {
 }
 
 export async function createCeremony(req: Request, res: Response) {
-  const ceremony = await ceremonyService.createCeremony(req.body);
+  // Garante arrays vazios se não enviados
+  const data = {
+    ...req.body,
+    participants: Array.isArray(req.body.participants) ? req.body.participants : [],
+    timeLogs: Array.isArray(req.body.timeLogs) ? req.body.timeLogs : [],
+  };
+  const ceremony = await ceremonyService.createCeremony(data);
   res.status(201).json(ceremony);
 }
 
 export async function updateCeremony(req: Request, res: Response) {
   const { id } = req.params;
-  const updated = await ceremonyService.updateCeremony(id, req.body);
+  // Garante arrays vazios se não enviados
+  const data = {
+    ...req.body,
+    participants: Array.isArray(req.body.participants) ? req.body.participants : [],
+    timeLogs: Array.isArray(req.body.timeLogs) ? req.body.timeLogs : [],
+  };
+  const updated = await ceremonyService.updateCeremony(id, data);
   if (!updated) return res.status(404).json({ message: "Ceremony not found" });
   res.json(updated);
 }

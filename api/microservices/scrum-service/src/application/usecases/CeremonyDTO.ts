@@ -7,8 +7,8 @@ export const CeremonySchema = z.object({
   startTime: z.coerce.date(),
   endTime: z.coerce.date(),
   duration: z.number().int().optional(),
-  participants: z.array(z.string()),
-  timeLogs: z.array(z.string()),
+  participants: z.array(z.string()).optional(),
+  timeLogs: z.array(z.string()).optional(),
 });
 
 export type CeremonyDTO = z.infer<typeof CeremonySchema>;

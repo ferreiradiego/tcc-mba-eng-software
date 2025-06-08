@@ -1,5 +1,4 @@
-// src/application/usecases/LoginUser.ts
-import { User } from '../../domain/entities/User';
+import { User } from "../../domain/entities/User";
 
 export interface LoginUserDTO {
   email: string;

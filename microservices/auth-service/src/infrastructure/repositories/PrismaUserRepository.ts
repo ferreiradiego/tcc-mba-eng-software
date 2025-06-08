@@ -1,7 +1,6 @@
-// src/infrastructure/repositories/PrismaUserRepository.ts
-import { UserRepository } from './UserRepository';
-import { User } from '../../domain/entities/User';
-import { prisma } from '../prisma/client';
+import { User } from "../../domain/entities/User";
+import { prisma } from "../prisma/client";
+import { UserRepository } from "./UserRepository";
 
 export class PrismaUserRepository implements UserRepository {
   async findByEmail(email: string): Promise<User | null> {
@@ -9,7 +8,7 @@ export class PrismaUserRepository implements UserRepository {
     return user as User | null;
   }
 
-  async create(user: Omit<User, 'id'>): Promise<User> {
+  async create(user: Omit<User, "id">): Promise<User> {
     const created = await prisma.user.create({ data: user });
     return created as User;
   }

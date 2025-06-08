@@ -1,5 +1,5 @@
+import { User } from "@domain/entities/User";
 import jwt from "jsonwebtoken";
-import { User } from "../../domain/entities/User";
 
 const JWT_SECRET = process.env.JWT_SECRET || "default_secret";
 const EXPIRES_IN = "1h";

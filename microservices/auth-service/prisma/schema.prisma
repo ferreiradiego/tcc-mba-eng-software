@@ -1,5 +1,3 @@
-// Prisma schema for User and Role
-
 generator client {
   provider = "prisma-client-js"
 }

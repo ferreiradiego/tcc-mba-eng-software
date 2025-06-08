@@ -339,6 +339,75 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Report",
+      "item": [
+        {
+          "name": "Relatórios",
+          "item": [
+            {
+              "name": "Relatório de Tarefas",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "http://localhost:3000/reports/tasks?userId={{userId}}", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["reports", "tasks"], "query": [ { "key": "userId", "value": "{{userId}}" } ] }
+              },
+              "response": []
+            },
+            {
+              "name": "Relatório de Cerimônias",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "http://localhost:3000/reports/ceremonies?userId={{userId}}", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["reports", "ceremonies"], "query": [ { "key": "userId", "value": "{{userId}}" } ] }
+              },
+              "response": []
+            },
+            {
+              "name": "Resumo Geral",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "http://localhost:3000/reports/summary?userId={{userId}}", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["reports", "summary"], "query": [ { "key": "userId", "value": "{{userId}}" } ] }
+              },
+              "response": []
+            },
+            {
+              "name": "Exportar PDF",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "http://localhost:3000/reports/export/pdf?userId={{userId}}", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["reports", "export", "pdf"], "query": [ { "key": "userId", "value": "{{userId}}" } ] }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Exemplos de Erro",
+          "item": [
+            {
+              "name": "Relatório de Tarefas - Token inválido",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer tokeninvalido" } ],
+                "url": { "raw": "http://localhost:3000/reports/tasks?userId={{userId}}", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["reports", "tasks"], "query": [ { "key": "userId", "value": "{{userId}}" } ] }
+              },
+              "response": []
+            },
+            {
+              "name": "Exportar PDF - userId ausente",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "http://localhost:3000/reports/export/pdf", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["reports", "export", "pdf"] }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
     }
   ],
   "variable": [

@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CeremonyType {
+  DAILY
+  PLANNING
+  REVIEW
+  RETROSPECTIVE
+}
+
+model Ceremony {
+  id           String        @id @default(uuid())
+  type         CeremonyType
+  scheduledAt  DateTime
+  startTime    DateTime
+  endTime      DateTime
+  duration     Int?         // minutos
+  participants String[]
+  timeLogs     String[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}

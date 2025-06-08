@@ -1,4 +1,24 @@
-import { Home, ListChecks, Timer, Users, FileText, Settings } from "lucide-react";
+"use client";
+
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useCurrentUser } from "@/hooks/use-current-user";
+import {
+  FileText,
+  Home,
+  ListChecks,
+  LogOut,
+  Settings,
+  Timer,
+  User2,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 
 const nav = [
@@ -7,21 +27,80 @@ const nav = [
   { href: "/dashboard/timelogs", label: "Tempo", icon: Timer },
   { href: "/dashboard/ceremonies", label: "Cerimônias", icon: Users },
   { href: "/dashboard/reports", label: "Relatórios", icon: FileText },
-  { href: "/dashboard/settings", label: "Configurações", icon: Settings },
 ];
 
 export function Sidebar() {
+  const { user, isLoading } = useCurrentUser();
+
   return (
-    <aside className="w-64 bg-background border-r h-screen p-4 flex flex-col gap-2">
-      <div className="font-bold text-lg mb-6">Dev Productivity</div>
-      <nav className="flex flex-col gap-2">
+    <aside className="w-64 bg-background border-r h-screen p-4 flex flex-col gap-4">
+      <div className="font-bold text-lg mb-2">Dev Productivity</div>
+      <div className="mb-2">
+        {isLoading ? (
+          <Skeleton className="h-16 w-full rounded-lg" />
+        ) : user ? (
+          <div className="flex items-center gap-3 bg-muted rounded-lg p-3 mb-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="focus:outline-none">
+                  <Avatar className="w-10 h-10">
+                    <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                      {user.name?.[0]?.toUpperCase() || (
+                        <User2 className="w-6 h-6" />
+                      )}
+                    </AvatarFallback>
+                  </Avatar>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-44 mt-2">
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard/settings">Perfil & Configurações</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard/reports">Meus Relatórios</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard/tasks">Minhas Tarefas</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link
+                    href="/logout"
+                    className="text-red-500 flex items-center gap-2"
+                  >
+                    <LogOut className="w-4 h-4" /> Sair
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <div className="flex-1 min-w-0">
+              <div className="font-semibold truncate">{user.name}</div>
+              <div className="text-xs text-muted-foreground truncate">
+                {user.email}
+              </div>
+            </div>
+            <Link href="/dashboard/settings">
+              <Settings className="w-5 h-5"/>
+            </Link>
+          </div>
+        ) : null}
+      </div>
+      <nav className="flex flex-col gap-1">
         {nav.map(({ href, label, icon: Icon }) => (
-          <Link key={href} href={href} className="flex items-center gap-2 rounded px-3 py-2 hover:bg-muted transition-colors">
-            <Icon className="w-5 h-5" />
-            <span>{label}</span>
+          <Link
+            key={href}
+            href={href}
+            className="flex items-center gap-2 rounded px-3 py-2 hover:bg-accent focus:bg-accent transition-colors group"
+          >
+            <Icon className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
+            <span className="truncate">{label}</span>
           </Link>
         ))}
-        <Link href="/logout" className="flex items-center gap-2 rounded px-3 py-2 text-red-500 hover:bg-muted transition-colors mt-8">
+        <div className="border-t my-4 border-border" />
+        <Link
+          href="/logout"
+          className="flex items-center gap-2 rounded px-3 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors mt-2 group"
+        >
+          <LogOut className="w-5 h-5 text-red-400 group-hover:text-red-600" />
           <span>Sair</span>
         </Link>
       </nav>

@@ -408,6 +408,53 @@
           ]
         }
       ]
+    },
+    {
+      "name": "Notification",
+      "item": [
+        {
+          "name": "Enviar Notificação por E-mail",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"destinatario@email.com\",\n  \"subject\": \"Assunto do e-mail\",\n  \"text\": \"Mensagem em texto simples\",\n  \"html\": \"<b>Mensagem em HTML</b>\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/notifications/send",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["notifications", "send"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Exemplo de Erro - Campos obrigatórios ausentes",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"\",\n  \"subject\": \"\",\n  \"text\": \"\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/notifications/send",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["notifications", "send"]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [

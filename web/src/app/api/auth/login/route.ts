@@ -35,6 +35,7 @@ export async function POST(req: NextRequest) {
     }
     return response;
   } catch (err) {
+    console.error("Erro ao autenticar:", err);
     return NextResponse.json({ error: "Erro ao autenticar" }, { status: 500 });
   }
 }

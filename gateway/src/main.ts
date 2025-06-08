@@ -21,7 +21,6 @@ app.use((req, res, next) => {
   }
 });
 
-// Proxies para cada microserviço
 app.use(
   "/auth",
   createProxyMiddleware({

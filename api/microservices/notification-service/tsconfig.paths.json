@@ -1,5 +1,0 @@
-{
-  "@application/*": ["src/application/*"],
-  "@infrastructure/*": ["src/infrastructure/*"],
-  "@presentation/*": ["src/presentation/*"]
-}

@@ -1,7 +1,10 @@
-import { Router } from "express";
 import * as reportController from "@presentation/controllers/reportController";
+import { authMiddleware } from "@presentation/middleware/authMiddleware";
+import { Router } from "express";
 
 const router = Router();
+
+router.use(authMiddleware);
 
 router.get("/tasks", reportController.tasksReport);
 router.get("/ceremonies", reportController.ceremoniesReport);

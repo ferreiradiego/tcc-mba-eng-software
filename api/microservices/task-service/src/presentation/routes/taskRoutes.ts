@@ -2,8 +2,11 @@ import { Router } from "express";
 import { validateBody } from "@presentation/middleware/validate";
 import * as taskController from "@presentation/controllers/taskController";
 import { TaskSchema } from "@application/usecases/TaskDTO";
+import { authMiddleware } from "@presentation/middleware/authMiddleware";
 
 const router = Router();
+
+router.use(authMiddleware);
 
 router.get("/", taskController.listTasks);
 router.get("/:id", taskController.getTask);

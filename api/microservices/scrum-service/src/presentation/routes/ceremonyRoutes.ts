@@ -2,8 +2,11 @@ import { Router } from "express";
 import { validateBody } from "@presentation/middleware/validate";
 import * as ceremonyController from "@presentation/controllers/ceremonyController";
 import { CeremonySchema } from "@application/usecases/CeremonyDTO";
+import { authMiddleware } from "@presentation/middleware/authMiddleware";
 
 const router = Router();
+
+router.use(authMiddleware);
 
 router.get("/", ceremonyController.listCeremonies);
 router.get("/:id", ceremonyController.getCeremony);

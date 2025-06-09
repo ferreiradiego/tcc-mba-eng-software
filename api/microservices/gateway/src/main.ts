@@ -10,7 +10,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["http://localhost:3007"],
+    origin: [process.env.WEB_APP_URL || "http://localhost:3007"],
     credentials: true,
   })
 );
@@ -75,6 +75,7 @@ app.use(
 app.get("/", (req, res) => res.send("API Gateway Running"));
 
 const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
   console.log(`API Gateway listening on port ${PORT}`);
 });

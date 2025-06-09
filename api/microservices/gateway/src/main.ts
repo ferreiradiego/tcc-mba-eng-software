@@ -10,7 +10,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: [process.env.WEB_APP_URL || "http://localhost:3007"],
+    origin: [process.env.WEB_APP_URL || "http://localhost:3006"],
     credentials: true,
   })
 );
@@ -61,13 +61,6 @@ app.use(
   "/reports",
   createProxyMiddleware({
     target: process.env.REPORT_SERVICE_URL || "http://localhost:3005",
-    changeOrigin: true,
-  })
-);
-app.use(
-  "/notifications",
-  createProxyMiddleware({
-    target: process.env.NOTIFICATION_SERVICE_URL || "http://localhost:3006",
     changeOrigin: true,
   })
 );

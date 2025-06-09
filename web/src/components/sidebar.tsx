@@ -79,12 +79,12 @@ export function Sidebar() {
               </div>
             </div>
             <Link href="/dashboard/settings">
-              <Settings className="w-5 h-5"/>
+              <Settings className="w-5 h-5" />
             </Link>
           </div>
         ) : null}
       </div>
-      <nav className="flex flex-col gap-1">
+      <nav className="flex flex-col gap-1 flex-1">
         {nav.map(({ href, label, icon: Icon }) => (
           <Link
             key={href}
@@ -96,14 +96,14 @@ export function Sidebar() {
           </Link>
         ))}
         <div className="border-t my-4 border-border" />
-        <Link
-          href="/logout"
-          className="flex items-center gap-2 rounded px-3 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors mt-2 group"
-        >
-          <LogOut className="w-5 h-5 text-red-400 group-hover:text-red-600" />
-          <span>Sair</span>
-        </Link>
       </nav>
+      <Link
+        href="/logout"
+        className="flex items-center gap-2 rounded px-3 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors mt-2 group w-full"
+      >
+        <LogOut className="w-5 h-5 text-red-400 group-hover:text-red-600" />
+        <span>Sair</span>
+      </Link>
     </aside>
   );
 }

@@ -38,13 +38,6 @@
       "problemMatcher": []
     },
     {
-      "label": "dev:notification-service",
-      "type": "shell",
-      "command": "npm run dev",
-      "options": { "cwd": "${workspaceFolder}/api/microservices/notification-service" },
-      "problemMatcher": []
-    },
-    {
       "label": "dev:gateway",
       "type": "shell",
       "command": "npm run dev",
@@ -59,7 +52,6 @@
         "dev:timelog-service",
         "dev:scrum-service",
         "dev:report-service",
-        "dev:notification-service",
         "dev:gateway"
       ],
       "dependsOrder": "parallel"

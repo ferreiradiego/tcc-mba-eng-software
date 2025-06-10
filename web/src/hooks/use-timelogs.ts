@@ -5,20 +5,17 @@ export type TimeLog = {
   id: string;
   userId: string;
   taskId: string;
-  startTime: string | Date;
-  endTime?: string | Date;
+  completedAt?: string | Date;
   duration?: number;
-  status: "running" | "paused" | "stopped";
+  status: "running" | "paused" | "stopped" | "finished";
   createdAt: string;
   updatedAt: string;
 };
 
 export type TimeLogForm = {
   taskId: string;
-  startTime: Date;
-  endTime?: Date;
   duration?: number;
-  status: "running" | "paused" | "stopped";
+  status: "running" | "paused" | "stopped" | "finished";
 };
 
 export function useTimeLogs() {

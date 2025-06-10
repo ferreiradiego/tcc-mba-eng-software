@@ -16,7 +16,13 @@ export class PrismaTimeLogRepository implements TimeLogRepository {
   async create(
     timelog: Omit<TimeLog, "id" | "createdAt" | "updatedAt">
   ): Promise<TimeLog> {
-    const created = await prisma.timeLog.create({ data: timelog });
+    const { completedAt, ...data } = timelog as any;
+    const created = await prisma.timeLog.create({
+      data: {
+        ...data,
+        completedAt: completedAt ? new Date(completedAt) : undefined,
+      },
+    });
     return mapPrismaTimeLogToDomain(created);
   }
 
@@ -24,7 +30,11 @@ export class PrismaTimeLogRepository implements TimeLogRepository {
     id: string,
     timelog: Partial<Omit<TimeLog, "id" | "userId" | "createdAt" | "updatedAt">>
   ): Promise<TimeLog | null> {
-    const updated = await prisma.timeLog.update({ where: { id }, data: timelog });
+    let data = { ...timelog };
+    if (timelog.status === "finished") {
+      data.completedAt = new Date();
+    }
+    const updated = await prisma.timeLog.update({ where: { id }, data });
     return mapPrismaTimeLogToDomain(updated);
   }
 
@@ -38,8 +48,7 @@ function mapPrismaTimeLogToDomain(prismaTimeLog: any): TimeLog {
     id: prismaTimeLog.id,
     userId: prismaTimeLog.userId,
     taskId: prismaTimeLog.taskId,
-    startTime: prismaTimeLog.startTime,
-    endTime: prismaTimeLog.endTime ?? undefined,
+    completedAt: prismaTimeLog.completedAt ?? undefined,
     duration: prismaTimeLog.duration ?? undefined,
     status: prismaTimeLog.status,
     createdAt: prismaTimeLog.createdAt,

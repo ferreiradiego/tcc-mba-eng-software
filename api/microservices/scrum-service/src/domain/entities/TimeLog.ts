@@ -2,10 +2,9 @@ export interface TimeLog {
   id: string;
   userId: string;
   taskId: string;
-  startTime: Date;
-  endTime?: Date;
-  duration?: number; // em minutos
-  status: 'running' | 'paused' | 'stopped';
+  completedAt?: Date;
+  duration?: number;
+  status: 'running' | 'paused' | 'stopped' | 'finished';
   createdAt: Date;
   updatedAt: Date;
 }

@@ -71,6 +71,9 @@ export default function TimeLogsList() {
                     } else if (timelog.status === "stopped") {
                       statusIcon = <StopCircle className="text-red-500" />;
                       statusColor = "text-red-600";
+                    } else if (timelog.status === "finished") {
+                      statusIcon = <StopCircle className="text-green-600" />;
+                      statusColor = "text-green-600";
                     }
                     return (
                       <div
@@ -88,17 +91,11 @@ export default function TimeLogsList() {
                                 Duração: {timelog.duration} min
                               </span>
                             )}
-                          </div>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            Início:{" "}
-                            {timelog.startTime
-                              ? new Date(timelog.startTime).toLocaleString()
-                              : "-"}
-                            {timelog.endTime && (
-                              <>
-                                {" | Fim: "}
-                                {new Date(timelog.endTime).toLocaleString()}
-                              </>
+                            {timelog.completedAt && (
+                              <span className="ml-2 text-muted-foreground">
+                                Concluído em:{" "}
+                                {new Date(timelog.completedAt).toLocaleString()}
+                              </span>
                             )}
                           </div>
                         </div>

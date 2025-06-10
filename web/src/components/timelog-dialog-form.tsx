@@ -1,6 +1,5 @@
 "use client";
 import {
-  ControlledDatePicker,
   ControlledInput,
   ControlledSelect,
 } from "@/components/controlled-fields";
@@ -23,10 +22,8 @@ import { useTasks } from "@/hooks/use-tasks";
 
 const TimeLogSchema = z.object({
   taskId: z.string().uuid({ message: "Selecione uma tarefa" }),
-  startTime: z.coerce.date(),
-  endTime: z.coerce.date().optional(),
   duration: z.coerce.number().int().positive().optional(),
-  status: z.enum(["running", "paused", "stopped"]),
+  status: z.enum(["running", "paused", "stopped", "finished"]),
 });
 type TimeLogForm = z.infer<typeof TimeLogSchema>;
 
@@ -47,10 +44,6 @@ export function TimeLogDialogForm({
     defaultValues: timelog
       ? {
           ...timelog,
-          startTime: timelog.startTime
-            ? new Date(timelog.startTime)
-            : undefined,
-          endTime: timelog.endTime ? new Date(timelog.endTime) : undefined,
         }
       : {
           status: "running",
@@ -62,8 +55,6 @@ export function TimeLogDialogForm({
       setOpen(true);
       methods.reset({
         ...timelog,
-        startTime: timelog.startTime ? new Date(timelog.startTime) : undefined,
-        endTime: timelog.endTime ? new Date(timelog.endTime) : undefined,
       });
     }
   }, [timelog]);
@@ -124,8 +115,6 @@ export function TimeLogDialogForm({
                 options={tasks.map((t) => ({ value: t.id, label: t.title }))}
                 className="w-full"
               />
-              <ControlledDatePicker name="startTime" label="Início" required />
-              <ControlledDatePicker name="endTime" label="Fim" />
               <ControlledInput
                 name="duration"
                 label="Duração (min)"
@@ -138,7 +127,8 @@ export function TimeLogDialogForm({
                 options={[
                   { value: "running", label: "Em andamento" },
                   { value: "paused", label: "Pausado" },
-                  { value: "stopped", label: "Finalizado" },
+                  { value: "stopped", label: "Parado" },
+                  { value: "finished", label: "Finalizado" },
                 ]}
               />
               <Button

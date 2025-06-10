@@ -65,10 +65,9 @@ model TimeLog {
   task       Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
   ceremonyId String?
   ceremony   Ceremony? @relation(fields: [ceremonyId], references: [id], onDelete: SetNull)
-  startTime  DateTime
-  endTime    DateTime?
+  completedAt DateTime? // Data de conclusão
   duration   Int? // em minutos
-  status     String // running, paused, stopped
+  status     String // running, paused, stopped, finished
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }

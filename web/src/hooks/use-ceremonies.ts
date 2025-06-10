@@ -36,14 +36,14 @@ export function useCeremonies() {
   } = useQuery<Ceremony[], Error>({
     queryKey: ["ceremonies"],
     queryFn: async () => {
-      const res = await api.get("/ceremonies");
+      const res = await api.get("/scrum/ceremonies");
       return res.data;
     },
   });
 
   const createCeremonyMutation = useMutation({
     mutationFn: async (data: CeremonyForm) => {
-      await api.post("/ceremonies", data);
+      await api.post("/scrum/ceremonies", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["ceremonies"] });
@@ -52,7 +52,7 @@ export function useCeremonies() {
 
   const deleteCeremonyMutation = useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(`/ceremonies/${id}`);
+      await api.delete(`/scrum/ceremonies/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["ceremonies"] });
@@ -61,7 +61,7 @@ export function useCeremonies() {
 
   const updateCeremonyMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      await api.put(`/ceremonies/${id}`, data);
+      await api.put(`/scrum/ceremonies/${id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["ceremonies"] });

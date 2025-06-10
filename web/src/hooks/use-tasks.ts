@@ -12,7 +12,7 @@ export type Task = {
   status: "todo" | "in_progress" | "done";
   priority: "low" | "medium" | "high";
   category?: string;
-  dueDate?: string | Date; // pode vir como string do backend
+  dueDate?: string | Date;
   dependencies?: string[];
   createdAt: string;
   updatedAt: string;
@@ -36,14 +36,14 @@ export function useTasks() {
   } = useQuery<Task[], Error>({
     queryKey: ["tasks"],
     queryFn: async () => {
-      const res = await api.get("/tasks");
+      const res = await api.get("/scrum/tasks");
       return res.data;
     },
   });
 
   const createTaskMutation = useMutation({
     mutationFn: async (data: TaskForm) => {
-      await api.post("/tasks", data);
+      await api.post("/scrum/tasks", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
@@ -52,7 +52,7 @@ export function useTasks() {
 
   const deleteTaskMutation = useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(`/tasks/${id}`);
+      await api.delete(`/scrum/tasks/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
@@ -61,7 +61,7 @@ export function useTasks() {
 
   const updateTaskMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      await api.put(`/tasks/${id}`, data);
+      await api.put(`/scrum/tasks/${id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });

@@ -31,14 +31,14 @@ export function useTimeLogs() {
   } = useQuery<TimeLog[], Error>({
     queryKey: ["timelogs"],
     queryFn: async () => {
-      const res = await api.get("/timelogs");
+      const res = await api.get("/scrum/timelogs");
       return res.data;
     },
   });
 
   const createTimeLogMutation = useMutation({
     mutationFn: async (data: TimeLogForm) => {
-      await api.post("/timelogs", data);
+      await api.post("/scrum/timelogs", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["timelogs"] });
@@ -47,7 +47,7 @@ export function useTimeLogs() {
 
   const deleteTimeLogMutation = useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(`/timelogs/${id}`);
+      await api.delete(`/scrum/timelogs/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["timelogs"] });
@@ -56,7 +56,7 @@ export function useTimeLogs() {
 
   const updateTimeLogMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      await api.put(`/timelogs/${id}`, data);
+      await api.put(`/scrum/timelogs/${id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["timelogs"] });

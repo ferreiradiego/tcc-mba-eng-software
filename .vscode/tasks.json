@@ -31,7 +31,7 @@
       "problemMatcher": []
     },
     {
-      "label": "dev:all-microservices",
+      "label": "dev:api",
       "dependsOn": [
         "dev:auth-service",
         "dev:scrum-service",
@@ -39,6 +39,21 @@
         "dev:gateway"
       ],
       "dependsOrder": "parallel"
+    },
+    {
+      "label": "dev:web",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": { "cwd": "${workspaceFolder}/web" },
+      "problemMatcher": []
+    },
+    {
+      "label": "dev:all",
+      "dependsOn": [
+        "dev:api",
+        "dev:web"
+      ],
+      "dependsOrder": "parallel",
     }
   ]
 }

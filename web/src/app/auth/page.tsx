@@ -76,6 +76,16 @@ export default function LoginPage() {
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Entrando..." : "Entrar"}
           </Button>
+          <div className="text-center text-sm mt-2">
+            Não tem conta?{" "}
+            <button
+              type="button"
+              className="text-blue-600 hover:underline bg-transparent border-0 p-0 m-0"
+              onClick={() => router.push("/auth/register")}
+            >
+              Cadastre-se
+            </button>
+          </div>
         </form>
       </FormProvider>
     </Card>

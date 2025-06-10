@@ -9,14 +9,16 @@ import { Clock, PauseCircle, StopCircle, FilePen, Trash2 } from "lucide-react";
 
 export default function TimeLogsList() {
   const { timelogs, loading, error, deleteTimeLog } = useTimeLogs();
-  // Agrupa timelogs por tarefa
+
   const { tasks } = useTasks();
+
   const grouped = tasks
     .map((task) => ({
       task,
       timelogs: timelogs.filter((t) => t.taskId === task.id),
     }))
     .filter((g) => g.timelogs.length > 0);
+
   const [editingTimeLog, setEditingTimeLog] = useState<TimeLog | null>(null);
   const statusMap: Record<string, string> = {
     running: "Em andamento",
@@ -29,7 +31,10 @@ export default function TimeLogsList() {
       {loading ? (
         <div className="flex flex-col gap-4">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="flex items-center gap-4 bg-card rounded-lg p-4 border animate-pulse">
+            <div
+              key={i}
+              className="flex items-center gap-4 bg-card rounded-lg p-4 border animate-pulse"
+            >
               <div className="h-12 w-12 bg-muted rounded-full" />
               <div className="flex-1 min-w-0 space-y-2">
                 <div className="h-4 w-1/2 bg-muted rounded" />
@@ -50,6 +55,11 @@ export default function TimeLogsList() {
               <div key={task.id}>
                 <div className="font-bold text-lg mb-2 flex items-center gap-2">
                   <span>{task.title}</span>
+                  {task.userStory && (
+                    <span className="ml-2 text-xs text-muted-foreground bg-gray-100 rounded px-2 py-0.5">
+                      {task.userStory.title}
+                    </span>
+                  )}
                 </div>
                 <div className="flex flex-col gap-4">
                   {timelogs.map((timelog) => {
@@ -70,13 +80,20 @@ export default function TimeLogsList() {
                         <div>{statusIcon}</div>
                         <div className="flex-1 min-w-0">
                           <div className="font-medium truncate">
-                            <span className={statusColor + " font-semibold"}>{statusMap[timelog.status] || timelog.status}</span>
+                            <span className={statusColor + " font-semibold"}>
+                              {statusMap[timelog.status] || timelog.status}
+                            </span>
                             {timelog.duration && (
-                              <span className="ml-2 text-muted-foreground">Duração: {timelog.duration} min</span>
+                              <span className="ml-2 text-muted-foreground">
+                                Duração: {timelog.duration} min
+                              </span>
                             )}
                           </div>
                           <div className="text-xs text-muted-foreground mt-1">
-                            Início: {timelog.startTime ? new Date(timelog.startTime).toLocaleString() : "-"}
+                            Início:{" "}
+                            {timelog.startTime
+                              ? new Date(timelog.startTime).toLocaleString()
+                              : "-"}
                             {timelog.endTime && (
                               <>
                                 {" | Fim: "}

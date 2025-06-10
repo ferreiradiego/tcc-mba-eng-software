@@ -8,6 +8,15 @@ import { CalendarCheck2, Clock, FilePen, Trash2, Users } from "lucide-react";
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
+// Função utilitária para exibir duração amigável
+function formatDuration(duration?: number): string | null {
+  if (typeof duration !== "number" || duration <= 0) return null;
+  if (duration < 60) return `${duration} min`;
+  const h = Math.floor(duration / 60);
+  const m = duration % 60;
+  return m === 0 ? `${h}h` : `${h}h ${m}min`;
+}
+
 export default function CeremoniesList() {
   const { ceremonies, loading, error, deleteCeremony } = useCeremonies();
   const [editingCeremony, setEditingCeremony] = useState<Ceremony | null>(null);
@@ -50,7 +59,9 @@ export default function CeremoniesList() {
                   <div className="flex-1 min-w-0">
                     <div className="font-semibold text-lg flex items-center gap-2">
                       <span>{type.label}{ceremony.type === "OTHER" && ceremony.typeDesc ? `: ${ceremony.typeDesc}` : null}</span>
-                      <span className="text-xs text-muted-foreground font-normal">{ceremony.duration ? `${ceremony.duration} min` : null}</span>
+                      <span className="text-xs text-muted-foreground font-normal">
+                        {formatDuration(ceremony.duration)}
+                      </span>
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">
                       Agendada: {ceremony.scheduledAt ? new Date(ceremony.scheduledAt).toLocaleString() : "-"}

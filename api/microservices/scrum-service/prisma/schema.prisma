@@ -7,6 +7,37 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model UserStory {
+  id             String   @id @default(uuid())
+  title          String
+  description    String?
+  status         String
+  activationDate DateTime?
+  sprintCode     String?
+  blocked        Boolean  @default(false)
+  tasks          Task[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Task {
+  id            String   @id @default(uuid())
+  userId        String
+  userStoryId   String?
+  userStory     UserStory? @relation(fields: [userStoryId], references: [id], onDelete: SetNull)
+  title         String
+  description   String?
+  status        String   // todo, in_progress, done
+  priority      String   // low, medium, high
+  category      String?
+  dueDate       DateTime?
+  dependencies  String[]
+  type          String   // bug, improvement, feature
+  timeLogs      TimeLog[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
 enum CeremonyType {
   DAILY
   PLANNING
@@ -22,7 +53,22 @@ model Ceremony {
   endTime      DateTime
   duration     Int?         // minutos
   participants String[]
-  timeLogs     String[]
+  timeLogs     TimeLog[]
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
+}
+
+model TimeLog {
+  id         String   @id @default(uuid())
+  userId     String
+  taskId     String
+  task       Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  ceremonyId String?
+  ceremony   Ceremony? @relation(fields: [ceremonyId], references: [id], onDelete: SetNull)
+  startTime  DateTime
+  endTime    DateTime?
+  duration   Int? // em minutos
+  status     String // running, paused, stopped
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }

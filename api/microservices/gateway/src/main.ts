@@ -10,7 +10,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: [process.env.WEB_APP_URL || "http://localhost:3006"],
+    origin: [process.env.WEB_APP_URL || "http://localhost:4000"],
     credentials: true,
   })
 );
@@ -32,42 +32,31 @@ app.use((req, res, next) => {
 app.use(
   "/auth",
   createProxyMiddleware({
-    target: process.env.AUTH_SERVICE_URL || "http://localhost:3001",
+    target: process.env.AUTH_SERVICE_URL || "http://localhost:4001",
     changeOrigin: true,
   })
 );
 app.use(
-  "/tasks",
+  "/scrum",
   createProxyMiddleware({
-    target: process.env.TASK_SERVICE_URL || "http://localhost:3002",
+    target: process.env.SCRUM_SERVICE_URL || "http://localhost:4002",
     changeOrigin: true,
-  })
-);
-app.use(
-  "/timelogs",
-  createProxyMiddleware({
-    target: process.env.TIMELOG_SERVICE_URL || "http://localhost:3003",
-    changeOrigin: true,
-  })
-);
-app.use(
-  "/ceremonies",
-  createProxyMiddleware({
-    target: process.env.SCRUM_SERVICE_URL || "http://localhost:3004",
-    changeOrigin: true,
+    pathRewrite: {
+      "^/scrum": "",
+    },
   })
 );
 app.use(
   "/reports",
   createProxyMiddleware({
-    target: process.env.REPORT_SERVICE_URL || "http://localhost:3005",
+    target: process.env.REPORT_SERVICE_URL || "http://localhost:4003",
     changeOrigin: true,
   })
 );
 
 app.get("/", (req, res) => res.send("API Gateway Running"));
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
   console.log(`API Gateway listening on port ${PORT}`);

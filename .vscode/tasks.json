@@ -10,20 +10,6 @@
       "problemMatcher": []
     },
     {
-      "label": "dev:task-service",
-      "type": "shell",
-      "command": "npm run dev",
-      "options": { "cwd": "${workspaceFolder}/api/microservices/task-service" },
-      "problemMatcher": []
-    },
-    {
-      "label": "dev:timelog-service",
-      "type": "shell",
-      "command": "npm run dev",
-      "options": { "cwd": "${workspaceFolder}/api/microservices/timelog-service" },
-      "problemMatcher": []
-    },
-    {
       "label": "dev:scrum-service",
       "type": "shell",
       "command": "npm run dev",
@@ -48,8 +34,6 @@
       "label": "dev:all-microservices",
       "dependsOn": [
         "dev:auth-service",
-        "dev:task-service",
-        "dev:timelog-service",
         "dev:scrum-service",
         "dev:report-service",
         "dev:gateway"

@@ -17,6 +17,7 @@ export default function CeremoniesList() {
     PLANNING: { label: "Planning", icon: <CalendarCheck2 />, color: "text-green-600" },
     REVIEW: { label: "Review", icon: <Clock />, color: "text-yellow-600" },
     RETROSPECTIVE: { label: "Retrospective", icon: <Clock />, color: "text-purple-600" },
+    OTHER: { label: "Outro", icon: <Clock />, color: "text-gray-600" },
   };
 
   return (
@@ -48,23 +49,31 @@ export default function CeremoniesList() {
                   <div className={`rounded-full bg-muted p-3 ${type.color}`}>{type.icon}</div>
                   <div className="flex-1 min-w-0">
                     <div className="font-semibold text-lg flex items-center gap-2">
-                      <span>{type.label}</span>
+                      <span>{type.label}{ceremony.type === "OTHER" && ceremony.typeDesc ? `: ${ceremony.typeDesc}` : null}</span>
                       <span className="text-xs text-muted-foreground font-normal">{ceremony.duration ? `${ceremony.duration} min` : null}</span>
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">
                       Agendada: {ceremony.scheduledAt ? new Date(ceremony.scheduledAt).toLocaleString() : "-"}
-                      {ceremony.startTime && (
-                        <>
-                          {" | Início: "}
-                          {new Date(ceremony.startTime).toLocaleString()}
-                        </>
-                      )}
-                      {ceremony.endTime && (
-                        <>
-                          {" | Fim: "}
-                          {new Date(ceremony.endTime).toLocaleString()}
-                        </>
-                      )}
+                      {ceremony.startTime &&
+                        ((ceremony.startTime instanceof Date && !isNaN(ceremony.startTime.getTime())) ||
+                        (typeof ceremony.startTime === "string" && /^\d{2}:\d{2}$/.test(ceremony.startTime))) && (
+                          <>
+                            {" | Início: "}
+                            {ceremony.startTime instanceof Date
+                              ? ceremony.startTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                              : ceremony.startTime}
+                          </>
+                        )}
+                      {ceremony.endTime &&
+                        ((ceremony.endTime instanceof Date && !isNaN(ceremony.endTime.getTime())) ||
+                        (typeof ceremony.endTime === "string" && /^\d{2}:\d{2}$/.test(ceremony.endTime))) && (
+                          <>
+                            {" | Fim: "}
+                            {ceremony.endTime instanceof Date
+                              ? ceremony.endTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                              : ceremony.endTime}
+                          </>
+                        )}
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">

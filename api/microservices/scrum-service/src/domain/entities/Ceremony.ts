@@ -3,11 +3,13 @@ export enum CeremonyType {
   PLANNING = 'PLANNING',
   REVIEW = 'REVIEW',
   RETROSPECTIVE = 'RETROSPECTIVE',
+  OTHER = 'OTHER',
 }
 
 export class Ceremony {
   id: string;
   type: CeremonyType;
+  typeDesc?: string;
   scheduledAt: Date;
   startTime: Date;
   endTime: Date;
@@ -20,6 +22,7 @@ export class Ceremony {
   constructor(props: Omit<Ceremony, 'id' | 'createdAt' | 'updatedAt'>, id?: string) {
     this.id = id ?? '';
     this.type = props.type;
+    this.typeDesc = props.typeDesc;
     this.scheduledAt = props.scheduledAt;
     this.startTime = props.startTime;
     this.endTime = props.endTime;

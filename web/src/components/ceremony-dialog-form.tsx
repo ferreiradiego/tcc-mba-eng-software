@@ -20,16 +20,86 @@ import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 
-const CeremonySchema = z.object({
-  type: z.enum(["DAILY", "PLANNING", "REVIEW", "RETROSPECTIVE"]),
-  scheduledAt: z.coerce.date(),
-  startTime: z.coerce.date(),
-  endTime: z.coerce.date(),
-  duration: z.coerce.number().int().positive().optional(),
-  participants: z.array(z.string()).optional(),
-  timeLogs: z.array(z.string()).optional(),
-});
+function toBrazilianTime(date: Date | string | null | undefined): string {
+  if (!date) return "";
+  let d: Date;
+  if (typeof date === "string") {
+    d = new Date(date);
+  } else if (Object.prototype.toString.call(date) === "[object Date]") {
+    d = date as Date;
+  } else {
+    return "";
+  }
+  if (isNaN(d.getTime()) || d.getTime() === 0) return "";
+  d = new Date(d.getTime() - 3 * 60 * 60 * 1000);
+  return d.toTimeString().slice(0, 5);
+}
+
+const CeremonySchema = z
+  .object({
+    type: z.enum(["DAILY", "PLANNING", "REVIEW", "RETROSPECTIVE", "OTHER"]),
+    typeDesc: z.string().optional(),
+    scheduledAt: z.coerce.date(),
+    startTime: z.string(),
+    endTime: z.string(),
+    participants: z.array(z.string()).optional(),
+    timeLogs: z.array(z.string()).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (
+      data.type === "OTHER" &&
+      (!data.typeDesc || data.typeDesc.trim().length === 0)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Descrição obrigatória para tipo OUTRO",
+        path: ["typeDesc"],
+      });
+    }
+  });
 type CeremonyForm = z.infer<typeof CeremonySchema>;
+
+function getCeremonyDefaultValues(ceremony?: Ceremony): Partial<CeremonyForm> {
+  if (!ceremony) {
+    return {
+      type: "DAILY",
+      typeDesc: "",
+      scheduledAt: undefined,
+      participants: [],
+      timeLogs: [],
+      startTime: "",
+      endTime: "",
+    };
+  }
+  const parseTime = (val: any) => {
+    if (!val || val === "1970-01-01T00:00:00.000Z") return "";
+    if (
+      Object.prototype.toString.call(val) === "[object Date]" &&
+      val.getTime() === 0
+    )
+      return "";
+    if (typeof val === "string") {
+      if (/^\d{2}:\d{2}$/.test(val.slice(11, 16))) return val.slice(11, 16);
+      if (/^\d{2}:\d{2}$/.test(val)) return val;
+      return toBrazilianTime(val);
+    }
+    if (Object.prototype.toString.call(val) === "[object Date]") {
+      return toBrazilianTime(val);
+    }
+    return "";
+  };
+  return {
+    type: ceremony.type as CeremonyForm["type"],
+    typeDesc: ceremony.typeDesc || "",
+    scheduledAt: ceremony.scheduledAt
+      ? new Date(ceremony.scheduledAt)
+      : undefined,
+    startTime: parseTime(ceremony.startTime),
+    endTime: parseTime(ceremony.endTime),
+    participants: ceremony.participants || [],
+    timeLogs: ceremony.timeLogs || [],
+  };
+}
 
 export function CeremonyDialogForm({
   ceremony,
@@ -41,39 +111,20 @@ export function CeremonyDialogForm({
   const isEdit = !!ceremony;
   const [open, setOpen] = useState(false);
   const { createCeremony, updateCeremony } = useCeremonies();
+
   const methods = useForm<CeremonyForm>({
     resolver: zodResolver(CeremonySchema),
-    defaultValues: ceremony
-      ? {
-          ...ceremony,
-          scheduledAt: ceremony.scheduledAt
-            ? new Date(ceremony.scheduledAt)
-            : undefined,
-          startTime: ceremony.startTime
-            ? new Date(ceremony.startTime)
-            : undefined,
-          endTime: ceremony.endTime ? new Date(ceremony.endTime) : undefined,
-        }
-      : {
-          type: "DAILY",
-        },
+    defaultValues: getCeremonyDefaultValues(ceremony),
   });
 
   useEffect(() => {
     if (isEdit && ceremony) {
       setOpen(true);
-      methods.reset({
-        ...ceremony,
-        scheduledAt: ceremony.scheduledAt
-          ? new Date(ceremony.scheduledAt)
-          : undefined,
-        startTime: ceremony.startTime
-          ? new Date(ceremony.startTime)
-          : undefined,
-        endTime: ceremony.endTime ? new Date(ceremony.endTime) : undefined,
-      });
+      methods.reset(getCeremonyDefaultValues(ceremony));
     }
   }, [ceremony]);
+
+  const selectedType = methods.watch("type");
 
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
@@ -83,10 +134,36 @@ export function CeremonyDialogForm({
   };
 
   async function onSubmit(data: CeremonyForm) {
+    const scheduledDate =
+      data.scheduledAt instanceof Date
+        ? data.scheduledAt
+        : new Date(data.scheduledAt);
+    function combineTimeUTC(date: Date, time: string) {
+      const [h, m] = time.split(":");
+      const d = new Date(
+        Date.UTC(
+          date.getUTCFullYear(),
+          date.getUTCMonth(),
+          date.getUTCDate(),
+          Number(h),
+          Number(m),
+          0,
+          0
+        )
+      );
+      return d;
+    }
+    const startTime = combineTimeUTC(scheduledDate, data.startTime);
+    const endTime = combineTimeUTC(scheduledDate, data.endTime);
+    const payload = {
+      ...data,
+      startTime,
+      endTime,
+    };
     if (isEdit && ceremony) {
-      await updateCeremony({ id: ceremony.id, data });
+      await updateCeremony({ id: ceremony.id, data: payload });
     } else {
-      await createCeremony({ ...data, participants: [], timeLogs: [] });
+      await createCeremony({ ...payload, participants: [], timeLogs: [] });
     }
     methods.reset();
     setOpen(false);
@@ -123,21 +200,33 @@ export function CeremonyDialogForm({
                   { value: "PLANNING", label: "Planning" },
                   { value: "REVIEW", label: "Review" },
                   { value: "RETROSPECTIVE", label: "Retrospective" },
+                  { value: "OTHER", label: "Outro" },
                 ]}
               />
+              {selectedType === "OTHER" && (
+                <ControlledInput
+                  name="typeDesc"
+                  label="Descrição do tipo"
+                  required
+                />
+              )}
               <ControlledDatePicker
                 name="scheduledAt"
                 label="Agendada para"
                 required
               />
-              <ControlledDatePicker name="startTime" label="Início" required />
-              <ControlledDatePicker name="endTime" label="Fim" required />
               <ControlledInput
-                name="duration"
-                label="Duração (min)"
-                type="number"
+                name="startTime"
+                label="Início"
+                type="time"
+                required
               />
-              {/* Participantes e timeLogs podem ser implementados como autocomplete/multiselect futuramente */}
+              <ControlledInput
+                name="endTime"
+                label="Fim"
+                type="time"
+                required
+              />
               <Button
                 type="submit"
                 disabled={methods.formState.isSubmitting}

@@ -43,14 +43,16 @@ enum CeremonyType {
   PLANNING
   REVIEW
   RETROSPECTIVE
+  OTHER
 }
 
 model Ceremony {
   id           String        @id @default(uuid())
   type         CeremonyType
-  scheduledAt  DateTime
-  startTime    DateTime
-  endTime      DateTime
+  typeDesc     String?      // descrição do tipo, usada quando type = OTHER
+  scheduledAt  DateTime     // data da cerimônia
+  startTime    DateTime     // horário de início
+  endTime      DateTime     // horário de fim
   duration     Int?         // minutos
   participants String[]
   timeLogs     TimeLog[]

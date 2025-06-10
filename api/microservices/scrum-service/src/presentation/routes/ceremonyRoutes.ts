@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { validateBody } from "@presentation/middleware/validate";
 import * as ceremonyController from "@presentation/controllers/ceremonyController";
-import { CeremonySchema } from "@application/usecases/CeremonyDTO";
+import { CeremonySchema, CeremonyUpdateSchema } from "@application/usecases/CeremonyDTO";
 import { authMiddleware } from "@presentation/middleware/authMiddleware";
 
 const router = Router();
@@ -17,7 +17,7 @@ router.post(
 );
 router.put(
   "/:id",
-  validateBody(CeremonySchema.partial()),
+  validateBody(CeremonyUpdateSchema),
   ceremonyController.updateCeremony
 );
 router.delete("/:id", ceremonyController.deleteCeremony);

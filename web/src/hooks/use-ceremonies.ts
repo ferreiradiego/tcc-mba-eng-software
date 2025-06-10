@@ -5,7 +5,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export type Ceremony = {
   id: string;
-  type: "DAILY" | "PLANNING" | "REVIEW" | "RETROSPECTIVE";
+  type: "DAILY" | "PLANNING" | "REVIEW" | "RETROSPECTIVE" | "OTHER";
+  typeDesc?: string;
   scheduledAt: string | Date;
   startTime: string | Date;
   endTime: string | Date;
@@ -17,7 +18,8 @@ export type Ceremony = {
 };
 
 export type CeremonyForm = {
-  type: "DAILY" | "PLANNING" | "REVIEW" | "RETROSPECTIVE";
+  type: "DAILY" | "PLANNING" | "REVIEW" | "RETROSPECTIVE" | "OTHER";
+  typeDesc?: string;
   scheduledAt: Date;
   startTime: Date;
   endTime: Date;

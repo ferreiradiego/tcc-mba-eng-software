@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { Task, useTasks } from "@/hooks/use-tasks";
+import { useUserStories } from "@/hooks/use-user-stories";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, PlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -29,6 +30,8 @@ const TaskSchema = z.object({
   priority: z.enum(["low", "medium", "high"]),
   category: z.string().optional(),
   dueDate: z.coerce.date().optional(),
+  userStoryId: z.string().uuid().optional(),
+  type: z.enum(["bug", "improvement", "feature"]), // campo type obrigatório
 });
 type TaskForm = z.infer<typeof TaskSchema>;
 
@@ -43,12 +46,14 @@ export function TaskDialogForm({
   const [open, setOpen] = useState(false);
   const { createTask, updateTask } = useTasks();
   const { user } = useCurrentUser();
+  const { userStories } = useUserStories();
   const methods = useForm<TaskForm>({
     resolver: zodResolver(TaskSchema),
     defaultValues: task
       ? {
           ...task,
           dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
+          userStoryId: (task as any).userStoryId || (task as any).userStory?.id || undefined,
         }
       : {
           status: "todo",
@@ -121,6 +126,23 @@ export function TaskDialogForm({
             >
               <ControlledInput name="title" label="Título" required />
               <ControlledTextArea name="description" label="Descrição" />
+              <ControlledSelect
+                name="userStoryId"
+                label="User Story"
+                options={userStories.map((us) => ({ value: us.id, label: us.title }))}
+                className="w-full"
+              />
+              <ControlledSelect
+                name="type"
+                label="Tipo"
+                required
+                options={[
+                  { value: "feature", label: "Funcionalidade" },
+                  { value: "improvement", label: "Melhoria" },
+                  { value: "bug", label: "Bug" },
+                ]}
+                className="w-full"
+              />
               <ControlledSelect
                 name="status"
                 label="Status"

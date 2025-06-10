@@ -4,7 +4,11 @@ import { prisma } from "@infrastructure/prisma/client";
 
 export class PrismaTaskRepository implements TaskRepository {
   async findAll(userId: string): Promise<Task[]> {
-    const tasks = await prisma.task.findMany({ where: { userId } });
+    const tasks = await prisma.task.findMany({
+      where: { userId },
+      include: { userStory: true },
+    });
+
     return tasks.map(mapPrismaTaskToDomain);
   }
 
@@ -16,7 +20,8 @@ export class PrismaTaskRepository implements TaskRepository {
   async create(
     task: Omit<Task, "id" | "createdAt" | "updatedAt">
   ): Promise<Task> {
-    const created = await prisma.task.create({ data: task });
+    const { userStory, ...data } = task;
+    const created = await prisma.task.create({ data });
     return mapPrismaTaskToDomain(created);
   }
 
@@ -24,7 +29,8 @@ export class PrismaTaskRepository implements TaskRepository {
     id: string,
     task: Partial<Omit<Task, "id" | "userId" | "createdAt" | "updatedAt">>
   ): Promise<Task | null> {
-    const updated = await prisma.task.update({ where: { id }, data: task });
+    const { userStory, ...data } = task;
+    const updated = await prisma.task.update({ where: { id }, data });
     return mapPrismaTaskToDomain(updated);
   }
 
@@ -37,6 +43,7 @@ function mapPrismaTaskToDomain(prismaTask: any): Task {
   return {
     id: prismaTask.id,
     userId: prismaTask.userId,
+    userStoryId: prismaTask.userStoryId ?? undefined,
     title: prismaTask.title,
     description: prismaTask.description ?? undefined,
     status: prismaTask.status as Task["status"],
@@ -47,5 +54,6 @@ function mapPrismaTaskToDomain(prismaTask: any): Task {
     createdAt: prismaTask.createdAt,
     updatedAt: prismaTask.updatedAt,
     type: prismaTask.type as Task["type"],
+    userStory: prismaTask.userStory ? { ...prismaTask.userStory } : undefined,
   };
 }

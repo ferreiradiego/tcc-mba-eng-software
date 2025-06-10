@@ -16,6 +16,18 @@ export type Task = {
   dependencies?: string[];
   createdAt: string;
   updatedAt: string;
+  userStoryId?: string;
+  userStory?: {
+    id: string;
+    title: string;
+    status: string;
+    description?: string;
+    activationDate?: Date;
+    sprintCode?: string;
+    blocked?: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
+  };
 };
 
 export type TaskForm = {

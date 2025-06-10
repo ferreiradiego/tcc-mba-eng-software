@@ -32,7 +32,14 @@ export default function TasksList() {
               key={task.id}
               className="py-2 flex items-center justify-between"
             >
-              <span className="font-medium">{task.title}</span>
+              <span className="font-medium">
+                {task.title}
+                {task?.userStory && (
+                  <span className="ml-2 text-xs text-muted-foreground bg-gray-100 rounded px-2 py-0.5">
+                    {task?.userStory?.title}
+                  </span>
+                )}
+              </span>
               <div className="flex gap-2">
                 <Button
                   variant="outline"

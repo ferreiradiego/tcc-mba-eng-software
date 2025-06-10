@@ -7,35 +7,83 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Trimester {
+  id        String   @id @default(uuid())
+  year      Int
+  number    Int
+  sprints   Sprint[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Sprint {
+  id          String      @id @default(uuid())
+  name        String
+  startDate   DateTime
+  endDate     DateTime
+  trimesterId String
+  trimester   Trimester   @relation(fields: [trimesterId], references: [id], onDelete: Cascade)
+  userStories UserStory[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+enum UserStoryStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+  BLOCKED
+}
+
 model UserStory {
-  id             String   @id @default(uuid())
+  id             String          @id @default(uuid())
   title          String
   description    String?
-  status         String
+  status         UserStoryStatus
   activationDate DateTime?
   sprintCode     String?
-  blocked        Boolean  @default(false)
+  blocked        Boolean         @default(false)
   tasks          Task[]
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  sprintId       String?
+  sprint         Sprint?         @relation(fields: [sprintId], references: [id], onDelete: Cascade)
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum TaskType {
+  BUG
+  IMPROVEMENT
+  FEATURE
 }
 
 model Task {
-  id            String   @id @default(uuid())
+  id            String       @id @default(uuid())
   userId        String
   userStoryId   String?
-  userStory     UserStory? @relation(fields: [userStoryId], references: [id], onDelete: SetNull)
+  userStory     UserStory?   @relation(fields: [userStoryId], references: [id], onDelete: SetNull)
   title         String
   description   String?
-  status        String   // todo, in_progress, done
-  priority      String   // low, medium, high
-  category      String?
+  status        TaskStatus
+  priority      TaskPriority
+  type          TaskType
   dueDate       DateTime?
   dependencies  String[]
-  type          String   // bug, improvement, feature
+  estimatedTime Int?
   timeLogs      TimeLog[]
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 }
 
 enum CeremonyType {
@@ -47,13 +95,13 @@ enum CeremonyType {
 }
 
 model Ceremony {
-  id           String        @id @default(uuid())
+  id           String       @id @default(uuid())
   type         CeremonyType
-  typeDesc     String?      // descrição do tipo, usada quando type = OTHER
-  scheduledAt  DateTime     // data da cerimônia
-  startTime    DateTime     // horário de início
-  endTime      DateTime     // horário de fim
-  duration     Int?         // minutos
+  typeDesc     String?
+  scheduledAt  DateTime
+  startTime    DateTime
+  endTime      DateTime
+  duration     Int?
   participants String[]
   timeLogs     TimeLog[]
   createdAt    DateTime     @default(now())
@@ -61,15 +109,15 @@ model Ceremony {
 }
 
 model TimeLog {
-  id         String   @id @default(uuid())
-  userId     String
-  taskId     String
-  task       Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  ceremonyId String?
-  ceremony   Ceremony? @relation(fields: [ceremonyId], references: [id], onDelete: SetNull)
-  completedAt DateTime? // Data de conclusão
-  duration   Int? // em minutos
-  status     String // running, paused, stopped, finished
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          String    @id @default(uuid())
+  userId      String
+  taskId      String
+  task        Task      @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  ceremonyId  String?
+  ceremony    Ceremony? @relation(fields: [ceremonyId], references: [id], onDelete: SetNull)
+  completedAt DateTime?
+  duration    Int?
+  status      String // running, paused, stopped, finished
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }

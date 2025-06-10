@@ -8,9 +8,10 @@ export function toUserStory(prismaUserStory: PrismaUserStory): UserStory {
     prismaUserStory.status,
     prismaUserStory.description ?? undefined,
     prismaUserStory.activationDate ?? undefined,
-    prismaUserStory.sprintCode ?? undefined,
     prismaUserStory.blocked,
     prismaUserStory.createdAt,
-    prismaUserStory.updatedAt
+    prismaUserStory.updatedAt,
+    undefined, // tasks handled elsewhere
+    prismaUserStory.sprintId ?? undefined
   );
 }

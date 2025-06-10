@@ -1,16 +1,17 @@
-import { z } from 'zod';
+import { TaskPriority, TaskStatus, TaskType } from "@prisma/client";
+import { z } from "zod";
 
 export const TaskSchema = z.object({
   userId: z.string().uuid(),
   userStoryId: z.string().uuid().optional(),
   title: z.string().min(2),
   description: z.string().optional(),
-  status: z.enum(['todo', 'in_progress', 'done']),
-  priority: z.enum(['low', 'medium', 'high']),
-  category: z.string().optional(),
+  status: z.nativeEnum(TaskStatus),
+  priority: z.nativeEnum(TaskPriority),
   dueDate: z.coerce.date().optional(),
   dependencies: z.array(z.string().uuid()).optional(),
-  type: z.enum(['bug', 'improvement', 'feature']),
+  type: z.nativeEnum(TaskType),
+  estimatedTime: z.number().int().positive().optional(),
 });
 
 export type TaskDTO = z.infer<typeof TaskSchema>;

@@ -13,18 +13,21 @@ function toPrismaCreateInput(
     status: data.status!,
     description: data.description,
     activationDate: data.activationDate,
-    sprintCode: data.sprintCode,
     blocked: data.blocked ?? false,
-    // tasks: undefined // handled by relation if needed
+    sprint: data.sprintId ? { connect: { id: data.sprintId } } : undefined,
   };
 }
 
 function toPrismaUpdateInput(
   data: Partial<UserStory>
 ): Prisma.UserStoryUpdateInput {
-  const { id, createdAt, updatedAt, tasks, ...rest } = data;
+  const { id, createdAt, updatedAt, tasks, sprint, sprintId, ...rest } = data;
+  const sprintConnection = sprintId
+    ? { sprint: { connect: { id: sprintId } } }
+    : {};
   return {
     ...rest,
+    ...sprintConnection,
   };
 }
 
@@ -51,7 +54,7 @@ export class PrismaUserStoryRepository implements UserStoryRepository {
       where: { id },
       data: toPrismaUpdateInput(data),
     });
-    return updated ? toUserStory(updated) : null;
+    return toUserStory(updated);
   }
   async delete(id: string): Promise<void> {
     await prisma.userStory.delete({ where: { id } });

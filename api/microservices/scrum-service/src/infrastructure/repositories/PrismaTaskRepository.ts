@@ -1,6 +1,7 @@
-import { Task } from "@domain/entities/Task";
-import { TaskRepository } from "./TaskRepository";
+import type { Task } from "@domain/entities/Task";
 import { prisma } from "@infrastructure/prisma/client";
+import type { TaskPriority, TaskStatus, TaskType } from "@prisma/client";
+import { TaskRepository } from "./TaskRepository";
 
 export class PrismaTaskRepository implements TaskRepository {
   async findAll(userId: string): Promise<Task[]> {
@@ -8,7 +9,6 @@ export class PrismaTaskRepository implements TaskRepository {
       where: { userId },
       include: { userStory: true },
     });
-
     return tasks.map(mapPrismaTaskToDomain);
   }
 
@@ -21,7 +21,16 @@ export class PrismaTaskRepository implements TaskRepository {
     task: Omit<Task, "id" | "createdAt" | "updatedAt">
   ): Promise<Task> {
     const { userStory, ...data } = task;
-    const created = await prisma.task.create({ data });
+    const created = await prisma.task.create({
+      data: {
+        ...data,
+        status: data.status,
+        priority: data.priority,
+        type: data.type,
+        estimatedTime: data.estimatedTime,
+        dependencies: data.dependencies ?? [],
+      },
+    });
     return mapPrismaTaskToDomain(created);
   }
 
@@ -30,7 +39,17 @@ export class PrismaTaskRepository implements TaskRepository {
     task: Partial<Omit<Task, "id" | "userId" | "createdAt" | "updatedAt">>
   ): Promise<Task | null> {
     const { userStory, ...data } = task;
-    const updated = await prisma.task.update({ where: { id }, data });
+    const updated = await prisma.task.update({
+      where: { id },
+      data: {
+        ...data,
+        status: data.status,
+        priority: data.priority,
+        type: data.type,
+        estimatedTime: data.estimatedTime,
+        dependencies: data.dependencies,
+      },
+    });
     return mapPrismaTaskToDomain(updated);
   }
 
@@ -44,16 +63,16 @@ function mapPrismaTaskToDomain(prismaTask: any): Task {
     id: prismaTask.id,
     userId: prismaTask.userId,
     userStoryId: prismaTask.userStoryId ?? undefined,
+    userStory: prismaTask.userStory ? { ...prismaTask.userStory } : undefined,
     title: prismaTask.title,
     description: prismaTask.description ?? undefined,
-    status: prismaTask.status as Task["status"],
-    priority: prismaTask.priority as Task["priority"],
-    category: prismaTask.category ?? undefined,
+    status: prismaTask.status as TaskStatus,
+    priority: prismaTask.priority as TaskPriority,
     dueDate: prismaTask.dueDate ?? undefined,
     dependencies: prismaTask.dependencies ?? [],
+    estimatedTime: prismaTask.estimatedTime ?? undefined,
     createdAt: prismaTask.createdAt,
     updatedAt: prismaTask.updatedAt,
-    type: prismaTask.type as Task["type"],
-    userStory: prismaTask.userStory ? { ...prismaTask.userStory } : undefined,
+    type: prismaTask.type as TaskType,
   };
 }

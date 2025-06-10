@@ -1,26 +1,19 @@
+import type { TaskPriority, TaskStatus, TaskType } from "@prisma/client";
+import type { UserStory } from "./UserStory";
+
 export interface Task {
   id: string;
   userId: string;
   userStoryId?: string;
-  userStory?: {
-    id: string;
-    title: string;
-    status: string;
-    description?: string;
-    activationDate?: Date;
-    sprintCode?: string;
-    blocked?: boolean;
-    createdAt?: Date;
-    updatedAt?: Date;
-  };
+  userStory?: UserStory;
   title: string;
   description?: string;
-  status: "todo" | "in_progress" | "done";
-  priority: "low" | "medium" | "high";
-  category?: string;
+  status: TaskStatus;
+  priority: TaskPriority;
   dueDate?: Date;
   dependencies?: string[];
+  estimatedTime?: number;
   createdAt: Date;
   updatedAt: Date;
-  type: "bug" | "improvement" | "feature";
+  type: TaskType;
 }

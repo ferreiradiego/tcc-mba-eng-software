@@ -111,7 +111,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"title\": \"Minha User Story\",\n  \"status\": \"todo\"\n}"
+                  "raw": "{\n  \"title\": \"Minha User Story\",\n  \"status\": \"TODO\",\n  \"sprintId\": \"<SPRINT_ID_AQUI>\"\n}"
                 },
                 "url": { "raw": "http://localhost:4000/scrum/user-stories", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["scrum", "user-stories"] }
               },
@@ -171,7 +171,7 @@
               "request": {
                 "method": "POST",
                 "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
-                "body": { "mode": "raw", "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"title\": \"Minha Primeira Task\",\n  \"description\": \"Descrição da task\",\n  \"status\": \"todo\",\n  \"priority\": \"medium\",\n  \"category\": \"Estudo\"\n}" },
+                "body": { "mode": "raw", "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"title\": \"Minha Primeira Task\",\n  \"description\": \"Descrição da task\",\n  \"status\": \"TODO\",\n  \"priority\": \"MEDIUM\",\n  \"type\": \"FEATURE\",\n  \"estimatedTime\": 120,\n  \"userStoryId\": \"{{userStoryId}}\"\n}" },
                 "url": { "raw": "http://localhost:4000/scrum/tasks", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["scrum", "tasks"] }
               },
               "response": []
@@ -316,6 +316,124 @@
                 "method": "DELETE",
                 "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
                 "url": { "raw": "http://localhost:4000/scrum/ceremonies/{{ceremonyId}}", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["scrum", "ceremonies", "{{ceremonyId}}"] }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Sprint",
+          "item": [
+            {
+              "name": "Criar Sprint",
+              "event": [{ "listen": "test", "script": { "exec": ["if (pm.response.code === 201) {", "  var json = pm.response.json();", "  pm.collectionVariables.set('sprintId', json.id);", "  pm.collectionVariables.set('sprintCode', json.code);", "}"], "type": "text/javascript" } }],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Sprint 1\",\n  \"startDate\": \"2025-06-10T00:00:00.000Z\",\n  \"endDate\": \"2025-06-20T00:00:00.000Z\",\n  \"trimesterId\": \"<TRIMESTER_ID_AQUI>\"\n}"
+                },
+                "url": { "raw": "http://localhost:4000/scrum/sprints", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["scrum", "sprints"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Listar Sprints",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "http://localhost:4000/scrum/sprints", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["scrum", "sprints"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Buscar Sprint por ID",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "http://localhost:4000/scrum/sprints/{{sprintId}}", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["scrum", "sprints", "{{sprintId}}"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Atualizar Sprint",
+              "request": {
+                "method": "PUT",
+                "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"name\": \"Sprint 1 Atualizada\"\n}" },
+                "url": { "raw": "http://localhost:4000/scrum/sprints/{{sprintId}}", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["scrum", "sprints", "{{sprintId}}"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Deletar Sprint",
+              "request": {
+                "method": "DELETE",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "http://localhost:4000/scrum/sprints/{{sprintId}}", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["scrum", "sprints", "{{sprintId}}"] }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Trimester",
+          "item": [
+            {
+              "name": "Criar Trimester",
+              "event": [{ "listen": "test", "script": { "exec": ["if (pm.response.code === 201) {", "  var json = pm.response.json();", "  pm.collectionVariables.set('trimesterId', json.id);", "}"], "type": "text/javascript" } }],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Content-Type", "value": "application/json" },
+                  { "key": "Authorization", "value": "Bearer {{token}}" }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"year\": 2025,\n  \"number\": 1\n}"
+                },
+                "url": { "raw": "http://localhost:4000/scrum/trimesters", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["scrum", "trimesters"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Listar Trimesters",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "http://localhost:4000/scrum/trimesters", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["scrum", "trimesters"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Buscar Trimester por ID",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "http://localhost:4000/scrum/trimesters/{{trimesterId}}", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["scrum", "trimesters", "{{trimesterId}}"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Atualizar Trimester",
+              "request": {
+                "method": "PUT",
+                "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"year\": 2025,\n  \"number\": 2\n}" },
+                "url": { "raw": "http://localhost:4000/scrum/trimesters/{{trimesterId}}", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["scrum", "trimesters", "{{trimesterId}}"] }
+              },
+              "response": []
+            },
+            {
+              "name": "Deletar Trimester",
+              "request": {
+                "method": "DELETE",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "http://localhost:4000/scrum/trimesters/{{trimesterId}}", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["scrum", "trimesters", "{{trimesterId}}"] }
               },
               "response": []
             }

@@ -6,7 +6,7 @@ export default function CeremoniesPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Cerimônias Scrum</h2>
+        <h2 className="text-2xl font-bold">Cerimônias</h2>
         <CeremonyDialogForm />
       </div>
       <Card className="p-4">

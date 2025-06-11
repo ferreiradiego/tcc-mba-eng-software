@@ -1,16 +1,25 @@
 import api from "@/lib/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+export interface Sprint {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  trimesterId: string;
+}
+
 export interface UserStory {
   id: string;
   title: string;
   status: string;
   description?: string;
   activationDate?: string;
-  sprintCode?: string;
   blocked?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  sprintId?: string;
+  sprint?: Sprint;
 }
 
 export interface UserStoryForm {
@@ -18,8 +27,8 @@ export interface UserStoryForm {
   status: string;
   description?: string;
   activationDate?: string;
-  sprintCode?: string;
   blocked?: boolean;
+  sprintId?: string;
 }
 
 export function useUserStories() {

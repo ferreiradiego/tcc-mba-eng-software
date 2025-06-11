@@ -29,7 +29,7 @@ const UserStorySchema = z.object({
   status: z.string(),
   description: z.string().optional(),
   activationDate: z.coerce.date().optional(),
-  sprintCode: z.string().optional(),
+  sprintId: z.string().optional(),
   blocked: z.boolean().optional(),
 });
 
@@ -129,7 +129,7 @@ export function UserStoryDialogForm({
                 options={USER_STORY_STATUS}
               />
               <ControlledSelect
-                name="sprintCode"
+                name="sprintId"
                 label="Sprint"
                 options={[
                   ...sprints.map((s: any) => ({

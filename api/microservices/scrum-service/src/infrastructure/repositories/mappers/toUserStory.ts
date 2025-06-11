@@ -1,7 +1,16 @@
-import { UserStory as PrismaUserStory } from '@prisma/client';
-import { UserStory } from '../../../domain/entities/UserStory';
+import { UserStory } from "../../../domain/entities/UserStory";
 
-export function toUserStory(prismaUserStory: PrismaUserStory): UserStory {
+export function toUserStory(prismaUserStory: any): UserStory {
+  const sprint =
+    prismaUserStory.sprint && typeof prismaUserStory.sprint === "object"
+      ? {
+          id: prismaUserStory.sprint.id,
+          name: prismaUserStory.sprint.name,
+          startDate: prismaUserStory.sprint.startDate,
+          endDate: prismaUserStory.sprint.endDate,
+          trimesterId: prismaUserStory.sprint.trimesterId,
+        }
+      : undefined;
   return new UserStory(
     prismaUserStory.id,
     prismaUserStory.title,
@@ -11,7 +20,8 @@ export function toUserStory(prismaUserStory: PrismaUserStory): UserStory {
     prismaUserStory.blocked,
     prismaUserStory.createdAt,
     prismaUserStory.updatedAt,
-    undefined, // tasks handled elsewhere
-    prismaUserStory.sprintId ?? undefined
+    undefined,
+    prismaUserStory.sprintId ?? undefined,
+    sprint
   );
 }

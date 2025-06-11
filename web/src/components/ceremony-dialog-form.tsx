@@ -13,7 +13,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useCeremonies, Ceremony } from "@/hooks/use-ceremonies";
+import { Ceremony, useCeremonies } from "@/hooks/use-ceremonies";
+import { useSprints } from "@/hooks/use-sprints";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, PlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -43,6 +44,7 @@ const CeremonySchema = z
     startTime: z.string(),
     endTime: z.string(),
     participants: z.array(z.string()).optional(),
+    sprintId: z.string().uuid().optional(),
   })
   .superRefine((data, ctx) => {
     if (
@@ -95,6 +97,7 @@ function getCeremonyDefaultValues(ceremony?: Ceremony): Partial<CeremonyForm> {
     startTime: parseTime(ceremony.startTime),
     endTime: parseTime(ceremony.endTime),
     participants: ceremony.participants || [],
+    sprintId: ceremony.sprintId || undefined,
   };
 }
 
@@ -108,6 +111,7 @@ export function CeremonyDialogForm({
   const isEdit = !!ceremony;
   const [open, setOpen] = useState(false);
   const { createCeremony, updateCeremony } = useCeremonies();
+  const { sprints, loading: loadingSprints } = useSprints();
 
   const methods = useForm<CeremonyForm>({
     resolver: zodResolver(CeremonySchema),
@@ -156,6 +160,7 @@ export function CeremonyDialogForm({
       ...data,
       startTime,
       endTime,
+      sprintId: data.sprintId || undefined,
     };
     if (isEdit && ceremony) {
       await updateCeremony({ id: ceremony.id, data: payload });
@@ -228,6 +233,19 @@ export function CeremonyDialogForm({
                 label="Fim"
                 type="time"
                 required
+              />
+              <ControlledSelect
+                name="sprintId"
+                label="Sprint"
+                options={
+                  loadingSprints
+                    ? []
+                    : sprints.map((s: any) => ({
+                        value: s.id,
+                        label: `${s.name} (${new Date(s.startDate).toLocaleDateString()} - ${new Date(s.endDate).toLocaleDateString()})`,
+                      }))
+                }
+                required={false}
               />
               <Button
                 type="submit"

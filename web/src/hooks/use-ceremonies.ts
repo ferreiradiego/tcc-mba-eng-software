@@ -14,6 +14,14 @@ export type Ceremony = {
   participants: string[];
   createdAt: string;
   updatedAt: string;
+  sprintId?: string;
+  sprint?: {
+    id: string;
+    name: string;
+    startDate: string;
+    endDate: string;
+    trimesterId: string;
+  };
 };
 
 export type CeremonyForm = {
@@ -24,6 +32,7 @@ export type CeremonyForm = {
   endTime: Date;
   duration?: number;
   participants: string[];
+  sprintId?: string;
 };
 
 export function useCeremonies() {

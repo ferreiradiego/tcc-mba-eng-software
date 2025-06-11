@@ -5,34 +5,38 @@ import { $Enums } from "@prisma/client";
 
 export class PrismaCeremonyRepository implements CeremonyRepository {
   async findAll(): Promise<Ceremony[]> {
-    const ceremonies = await prisma.ceremony.findMany();
-
-    console.log(ceremonies)
+    const ceremonies = await prisma.ceremony.findMany({
+      include: { sprint: true },
+    });
     return ceremonies.map(mapPrismaCeremonyToDomain);
   }
 
   async findById(id: string): Promise<Ceremony | null> {
-    const ceremony = await prisma.ceremony.findUnique({ where: { id } });
+    const ceremony = await prisma.ceremony.findUnique({
+      where: { id },
+      include: { sprint: true },
+    });
     return ceremony ? mapPrismaCeremonyToDomain(ceremony) : null;
   }
 
   async create(
     ceremony: Omit<Ceremony, "id" | "createdAt" | "updatedAt">
   ): Promise<Ceremony> {
-
-    console.log(ceremony)
-
-    const { ...rest } = ceremony;
+    const { sprint, ...rest } = ceremony;
     const duration =
       rest.startTime && rest.endTime
-        ? Math.round((rest.endTime.getTime() - rest.startTime.getTime()) / 60000)
+        ? Math.round(
+            (rest.endTime.getTime() - rest.startTime.getTime()) / 60000
+          )
         : undefined;
     const created = await prisma.ceremony.create({
       data: {
         ...rest,
         type: rest.type as $Enums.CeremonyType,
         duration,
+        sprintId: rest.sprintId,
       },
+      include: { sprint: true },
     });
     return mapPrismaCeremonyToDomain(created);
   }
@@ -41,10 +45,12 @@ export class PrismaCeremonyRepository implements CeremonyRepository {
     id: string,
     ceremony: Partial<Omit<Ceremony, "id" | "createdAt" | "updatedAt">>
   ): Promise<Ceremony | null> {
-    const { ...rest } = ceremony;
+    const { sprint, ...rest } = ceremony;
     const duration =
       rest.startTime && rest.endTime
-        ? Math.round((rest.endTime.getTime() - rest.startTime.getTime()) / 60000)
+        ? Math.round(
+            (rest.endTime.getTime() - rest.startTime.getTime()) / 60000
+          )
         : undefined;
     const updated = await prisma.ceremony.update({
       where: { id },
@@ -52,7 +58,9 @@ export class PrismaCeremonyRepository implements CeremonyRepository {
         ...rest,
         type: rest.type as $Enums.CeremonyType,
         duration,
+        sprintId: rest.sprintId,
       },
+      include: { sprint: true },
     });
     return mapPrismaCeremonyToDomain(updated);
   }
@@ -74,5 +82,7 @@ function mapPrismaCeremonyToDomain(prismaCeremony: any): Ceremony {
     participants: prismaCeremony.participants ?? [],
     createdAt: prismaCeremony.createdAt,
     updatedAt: prismaCeremony.updatedAt,
+    sprintId: prismaCeremony.sprintId,
+    sprint: prismaCeremony.sprint ?? undefined,
   };
 }

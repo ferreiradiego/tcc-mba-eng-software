@@ -24,6 +24,7 @@ model Sprint {
   trimesterId String
   trimester   Trimester   @relation(fields: [trimesterId], references: [id], onDelete: Cascade)
   userStories UserStory[]
+  ceremonies  Ceremony[]
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 }
@@ -64,10 +65,10 @@ enum TaskType {
 }
 
 model Task {
-  id            String       @id @default(uuid())
+  id            String     @id @default(uuid())
   userId        String
   userStoryId   String?
-  userStory     UserStory?   @relation(fields: [userStoryId], references: [id], onDelete: SetNull)
+  userStory     UserStory? @relation(fields: [userStoryId], references: [id], onDelete: SetNull)
   title         String
   description   String?
   status        TaskStatus
@@ -77,8 +78,8 @@ model Task {
   estimatedTime Int?
   startedAt     DateTime?
   finishedAt    DateTime?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 }
 
 enum CeremonyType {
@@ -100,4 +101,6 @@ model Ceremony {
   participants String[]
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
+  sprintId     String?
+  sprint       Sprint?      @relation(fields: [sprintId], references: [id], onDelete: SetNull)
 }

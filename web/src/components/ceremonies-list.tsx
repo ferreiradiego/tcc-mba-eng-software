@@ -1,15 +1,15 @@
 "use client";
 
 import { CeremonyDialogForm } from "@/components/ceremony-dialog-form";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Ceremony, useCeremonies } from "@/hooks/use-ceremonies";
-import { CalendarCheck2, Clock, FilePen, Trash2, Users } from "lucide-react";
-import { useState } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Card } from "@/components/ui/card";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -17,14 +17,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover";
-import { addDays, format as formatDate, isAfter, isBefore, isSameDay } from "date-fns";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Ceremony, useCeremonies } from "@/hooks/use-ceremonies";
+import { useUrlFilters } from "@/hooks/use-url-filters";
 import { cn } from "@/lib/utils";
+import {
+  addDays,
+  format,
+  format as formatDate,
+  isAfter,
+  isBefore,
+  isSameDay,
+} from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { CalendarCheck2, Clock, FilePen, Trash2, Users } from "lucide-react";
+import { useEffect, useState } from "react";
 
 function formatDuration(duration?: number): string | null {
   if (typeof duration !== "number" || duration <= 0) return null;
@@ -37,15 +44,46 @@ function formatDuration(duration?: number): string | null {
 export default function CeremoniesList() {
   const { ceremonies, loading, error, deleteCeremony } = useCeremonies();
   const [editingCeremony, setEditingCeremony] = useState<Ceremony | null>(null);
-  const [typeFilter, setTypeFilter] = useState<string>("ALL");
-  const [statusFilter, setStatusFilter] = useState<string>("ALL");
+
+  // Sincronização dos filtros com a URL
+  const { filters, setFilter, clearFilters } = useUrlFilters([
+    "type",
+    "status",
+    "dateFrom",
+    "dateTo",
+  ]);
+
+  // Estado local sincronizado com a URL
+  const [typeFilter, setTypeFilter] = useState<string>(filters.type || "ALL");
+  const [statusFilter, setStatusFilter] = useState<string>(
+    filters.status || "ALL"
+  );
   const [dateRange, setDateRange] = useState<{
     from: Date | null;
     to: Date | null;
-  }>({
-    from: null,
-    to: null,
+  }>(() => {
+    const from = filters.dateFrom ? new Date(filters.dateFrom) : null;
+    const to = filters.dateTo ? new Date(filters.dateTo) : null;
+    return { from, to };
   });
+
+  // Atualiza URL ao mudar filtros
+  useEffect(() => {
+    setFilter("type", typeFilter !== "ALL" ? typeFilter : undefined);
+  }, [typeFilter]);
+  useEffect(() => {
+    setFilter("status", statusFilter !== "ALL" ? statusFilter : undefined);
+  }, [statusFilter]);
+  useEffect(() => {
+    setFilter(
+      "dateFrom",
+      dateRange.from ? dateRange.from.toISOString().slice(0, 10) : undefined
+    );
+    setFilter(
+      "dateTo",
+      dateRange.to ? dateRange.to.toISOString().slice(0, 10) : undefined
+    );
+  }, [dateRange]);
 
   const typeMap: Record<
     string,
@@ -69,28 +107,32 @@ export default function CeremoniesList() {
   const filteredCeremonies = ceremonies.filter((ceremony) => {
     const isDone =
       ceremony.scheduledAt && new Date(ceremony.scheduledAt) <= new Date();
-    const typeMatch =
-      typeFilter === "ALL" || ceremony.type === typeFilter;
+    const typeMatch = typeFilter === "ALL" || ceremony.type === typeFilter;
     const statusMatch =
       statusFilter === "ALL" ||
       (statusFilter === "REALIZADA" && isDone) ||
       (statusFilter === "PENDENTE" && !isDone);
-    const scheduledDate = ceremony.scheduledAt ? new Date(ceremony.scheduledAt) : null;
+    const scheduledDate = ceremony.scheduledAt
+      ? new Date(ceremony.scheduledAt)
+      : null;
     let dateMatch = true;
     if (dateRange.from && dateRange.to && scheduledDate) {
       dateMatch =
-        (isSameDay(scheduledDate, dateRange.from) || isAfter(scheduledDate, dateRange.from)) &&
-        (isSameDay(scheduledDate, dateRange.to) || isBefore(scheduledDate, addDays(dateRange.to, 1)));
+        (isSameDay(scheduledDate, dateRange.from) ||
+          isAfter(scheduledDate, dateRange.from)) &&
+        (isSameDay(scheduledDate, dateRange.to) ||
+          isBefore(scheduledDate, addDays(dateRange.to, 1)));
     } else if (dateRange.from && scheduledDate) {
-      dateMatch = isSameDay(scheduledDate, dateRange.from) || isAfter(scheduledDate, dateRange.from);
+      dateMatch =
+        isSameDay(scheduledDate, dateRange.from) ||
+        isAfter(scheduledDate, dateRange.from);
     }
     return typeMatch && statusMatch && dateMatch;
   });
 
   return (
     <>
-      {/* Filtros */}
-      <div className="flex flex-wrap gap-4 mb-4">
+      <div className="flex flex-wrap gap-4 mb-4 items-center">
         <div>
           <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger className="w-[160px]">
@@ -129,7 +171,9 @@ export default function CeremoniesList() {
                 )}
               >
                 {dateRange.from && dateRange.to
-                  ? `${formatDate(dateRange.from, "P", { locale: ptBR })} - ${formatDate(dateRange.to, "P", { locale: ptBR })}`
+                  ? `${formatDate(dateRange.from, "P", {
+                      locale: ptBR,
+                    })} - ${formatDate(dateRange.to, "P", { locale: ptBR })}`
                   : dateRange.from
                   ? formatDate(dateRange.from, "P", { locale: ptBR })
                   : "Filtrar por período"}
@@ -138,16 +182,27 @@ export default function CeremoniesList() {
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="range"
-                selected={dateRange.from && dateRange.to ? { from: dateRange.from, to: dateRange.to } : undefined}
-                onSelect={(range) => setDateRange({ from: range?.from ?? null, to: range?.to ?? null })}
+                selected={
+                  dateRange.from && dateRange.to
+                    ? { from: dateRange.from, to: dateRange.to }
+                    : undefined
+                }
+                onSelect={(range) =>
+                  setDateRange({
+                    from: range?.from ?? null,
+                    to: range?.to ?? null,
+                  })
+                }
                 required={false}
-                initialFocus
               />
               {(dateRange.from || dateRange.to) && (
                 <Button
                   variant="ghost"
                   className="mt-2 w-full"
-                  onClick={() => setDateRange({ from: null, to: null })}
+                  onClick={() => {
+                    setDateRange({ from: null, to: null });
+                    clearFilters();
+                  }}
                 >
                   Limpar filtro
                 </Button>
@@ -155,6 +210,18 @@ export default function CeremoniesList() {
             </PopoverContent>
           </Popover>
         </div>
+        <Button
+          variant="ghost"
+          className="h-9"
+          onClick={() => {
+            setTypeFilter("ALL");
+            setStatusFilter("ALL");
+            setDateRange({ from: null, to: null });
+            clearFilters();
+          }}
+        >
+          Limpar todos os filtros
+        </Button>
       </div>
 
       {loading ? (

@@ -147,7 +147,6 @@ export default function TasksList() {
                           </Badge>
                         )}
 
-                        {/* Duração fora do badge, mais amigável */}
                         {getDuration(task) !== null && (
                           <span className="ml-2 text-sm text-purple-700 font-semibold flex items-center gap-1">
                             <Clock className="w-4 h-4" />
@@ -157,29 +156,6 @@ export default function TasksList() {
                               : "-"}
                           </span>
                         )}
-                        {/* Desvio de tempo */}
-                        {typeof task.estimatedTime === "number" &&
-                          getDuration(task) !== null && (
-                            <Badge
-                              className={`ml-2 flex items-center gap-1 ${
-                                (getDuration(task) ?? 0) > task.estimatedTime
-                                  ? "bg-red-100 text-red-800"
-                                  : "bg-green-100 text-green-800"
-                              }`}
-                              title="Desvio de tempo"
-                            >
-                              <AlertCircle className="w-3 h-3" />
-                              {(getDuration(task) ?? 0) > task.estimatedTime
-                                ? `+${formatMinutes(
-                                    (getDuration(task) ?? 0) -
-                                      task.estimatedTime
-                                  )}`
-                                : `${formatMinutes(
-                                    (getDuration(task) ?? 0) -
-                                      task.estimatedTime
-                                  )}`}
-                            </Badge>
-                          )}
                       </div>
                       <div className="flex gap-2">
                         <Button

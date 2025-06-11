@@ -132,7 +132,7 @@ export function UserStoryDialogForm({
                 name="sprintId"
                 label="Sprint"
                 options={[
-                  ...sprints.map((s: any) => ({
+                  ...sprints.map((s) => ({
                     value: s.id,
                     label: s.name,
                   })),

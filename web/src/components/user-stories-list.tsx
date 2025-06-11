@@ -29,8 +29,13 @@ export default function UserStoriesList() {
     return acc;
   }, {});
 
-  // Mapping amigável para status
-  const statusMap: Record<string, { label: string; variant: "default" | "secondary" | "outline" | "destructive" }> = {
+  const statusMap: Record<
+    string,
+    {
+      label: string;
+      variant: "default" | "secondary" | "outline" | "destructive";
+    }
+  > = {
     TODO: { label: "A Fazer", variant: "secondary" },
     IN_PROGRESS: { label: "Em Progresso", variant: "outline" },
     DONE: { label: "Concluída", variant: "default" },
@@ -62,18 +67,28 @@ export default function UserStoriesList() {
                 <span className="font-semibold text-lg text-primary">
                   {trimesterLabel}
                 </span>
-                <Badge variant="secondary" className="text-xs px-2 py-0.5 rounded">
-                  {Object.values(sprints).reduce((acc, arr) => acc + arr.length, 0)} US
+                <Badge
+                  variant="secondary"
+                  className="text-xs px-2 py-0.5 rounded"
+                >
+                  {Object.values(sprints).reduce(
+                    (acc, arr) => acc + arr.length,
+                    0
+                  )}{" "}
+                  US
                 </Badge>
               </div>
-              <div className="space-y-3 ml-2">
+              <div className="space-y-6 ml-2">
                 {Object.entries(sprints).map(([sprintName, stories]) => (
                   <div key={sprintName} className="mb-1">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-medium text-sm text-muted-foreground">
                         {sprintName}
                       </span>
-                      <Badge variant="outline" className="text-xs px-2 py-0.5 rounded">
+                      <Badge
+                        variant="outline"
+                        className="text-xs px-2 py-0.5 rounded"
+                      >
                         {stories.length} US
                       </Badge>
                     </div>
@@ -88,17 +103,31 @@ export default function UserStoriesList() {
                               {story.title}
                             </span>
                             <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
-                              <Badge variant={statusMap[story.status]?.variant || "default"} className="px-2 py-0.5 rounded">
+                              <Badge
+                                variant={
+                                  statusMap[story.status]?.variant || "default"
+                                }
+                                className="px-2 py-0.5 rounded"
+                              >
                                 {statusMap[story.status]?.label || story.status}
                               </Badge>
                               {story.blocked && (
-                                <Badge variant="destructive" className="px-2 py-0.5 rounded">Bloqueada</Badge>
+                                <Badge
+                                  variant="destructive"
+                                  className="px-2 py-0.5 rounded"
+                                >
+                                  Bloqueada
+                                </Badge>
                               )}
                               {story.sprint?.startDate && (
                                 <span>
-                                  {new Date(story.sprint.startDate).toLocaleDateString("pt-BR")}
+                                  {new Date(
+                                    story.sprint.startDate
+                                  ).toLocaleDateString("pt-BR")}
                                   {story.sprint.endDate
-                                    ? ` - ${new Date(story.sprint.endDate).toLocaleDateString("pt-BR")}`
+                                    ? ` - ${new Date(
+                                        story.sprint.endDate
+                                      ).toLocaleDateString("pt-BR")}`
                                     : ""}
                                 </span>
                               )}

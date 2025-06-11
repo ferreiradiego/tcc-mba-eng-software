@@ -12,7 +12,6 @@ export type Ceremony = {
   endTime: string | Date;
   duration?: number;
   participants: string[];
-  timeLogs: string[];
   createdAt: string;
   updatedAt: string;
 };
@@ -25,7 +24,6 @@ export type CeremonyForm = {
   endTime: Date;
   duration?: number;
   participants: string[];
-  timeLogs: string[];
 };
 
 export function useCeremonies() {

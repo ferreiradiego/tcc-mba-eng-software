@@ -1,6 +1,5 @@
 import ceremonyRoutes from "@presentation/routes/ceremonyRoutes";
 import taskRoutes from "@presentation/routes/taskRoutes";
-import timelogRoutes from "@presentation/routes/timelogRoutes";
 import userStoryRoutes from "@presentation/routes/userStoryRoutes";
 import sprintRoutes from "@presentation/routes/sprintRoutes";
 import trimesterRoutes from "@presentation/routes/trimesterRoutes";
@@ -14,7 +13,6 @@ app.use(express.json());
 
 app.use("/ceremonies", ceremonyRoutes);
 app.use("/tasks", taskRoutes);
-app.use("/timelogs", timelogRoutes);
 app.use("/user-stories", userStoryRoutes);
 app.use("/sprints", sprintRoutes);
 app.use("/trimesters", trimesterRoutes);

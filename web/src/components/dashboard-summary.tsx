@@ -80,11 +80,9 @@ export default function DashboardSummary() {
   // Dados para gráficos principais
   const totalTasks = filteredTasks.length;
   const totalCeremonies = filteredCeremonies.length;
-  const totalTimeLogs = summary.data?.data.totalTimeLogs ?? 0;
   const chartData = [
     { name: "Tarefas", value: totalTasks },
     { name: "Cerimônias", value: totalCeremonies },
-    { name: "Time Logs", value: totalTimeLogs },
   ];
 
   // Tabela de tarefas (exemplo)
@@ -161,10 +159,7 @@ export default function DashboardSummary() {
           <div className="flex items-center gap-2 text-orange-700 dark:text-orange-300"><span className="font-bold text-2xl">{totalCeremonies}</span> <span className="text-sm">Cerimônias</span></div>
         </Card>
         <Card className="rounded-lg p-6 shadow flex flex-col items-center justify-center bg-green-50 dark:bg-green-950">
-          <div className="flex items-center gap-2 text-green-700 dark:text-green-300"><span className="font-bold text-2xl">{totalTimeLogs}</span> <span className="text-sm">Time Logs</span></div>
-        </Card>
-        <Card className="rounded-lg p-6 shadow flex flex-col items-center justify-center bg-purple-50 dark:bg-purple-950">
-          <div className="flex items-center gap-2 text-purple-700 dark:text-purple-300"><span className="font-bold text-2xl">{statusMap.length}</span> <span className="text-sm">Status de Tarefas</span></div>
+          <div className="flex items-center gap-2 text-green-700 dark:text-green-300"><span className="font-bold text-2xl">{statusMap.length}</span> <span className="text-sm">Status de Tarefas</span></div>
         </Card>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">

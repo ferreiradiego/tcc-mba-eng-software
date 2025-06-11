@@ -22,7 +22,7 @@ export class PrismaCeremonyRepository implements CeremonyRepository {
 
     console.log(ceremony)
 
-    const { timeLogs, ...rest } = ceremony;
+    const { ...rest } = ceremony;
     const duration =
       rest.startTime && rest.endTime
         ? Math.round((rest.endTime.getTime() - rest.startTime.getTime()) / 60000)
@@ -32,10 +32,6 @@ export class PrismaCeremonyRepository implements CeremonyRepository {
         ...rest,
         type: rest.type as $Enums.CeremonyType,
         duration,
-        timeLogs:
-          timeLogs && Array.isArray(timeLogs)
-            ? { connect: timeLogs.map((id) => ({ id })) }
-            : undefined,
       },
     });
     return mapPrismaCeremonyToDomain(created);
@@ -45,7 +41,7 @@ export class PrismaCeremonyRepository implements CeremonyRepository {
     id: string,
     ceremony: Partial<Omit<Ceremony, "id" | "createdAt" | "updatedAt">>
   ): Promise<Ceremony | null> {
-    const { timeLogs, ...rest } = ceremony;
+    const { ...rest } = ceremony;
     const duration =
       rest.startTime && rest.endTime
         ? Math.round((rest.endTime.getTime() - rest.startTime.getTime()) / 60000)
@@ -56,9 +52,6 @@ export class PrismaCeremonyRepository implements CeremonyRepository {
         ...rest,
         type: rest.type as $Enums.CeremonyType,
         duration,
-        ...(timeLogs && Array.isArray(timeLogs)
-          ? { timeLogs: { set: [], connect: timeLogs.map((id) => ({ id })) } }
-          : {}),
       },
     });
     return mapPrismaCeremonyToDomain(updated);
@@ -79,9 +72,6 @@ function mapPrismaCeremonyToDomain(prismaCeremony: any): Ceremony {
     endTime: prismaCeremony.endTime,
     duration: prismaCeremony.duration ?? undefined,
     participants: prismaCeremony.participants ?? [],
-    timeLogs: prismaCeremony.timeLogs
-      ? prismaCeremony.timeLogs.map((tl: any) => tl.id)
-      : [],
     createdAt: prismaCeremony.createdAt,
     updatedAt: prismaCeremony.updatedAt,
   };

@@ -67,10 +67,6 @@ export default function ReportsSummary() {
               </a>
             </Button>
           </div>
-          <div>
-            Time logs:{" "}
-            <span className="font-semibold">{summary.data?.data.totalTimeLogs ?? 0}</span>
-          </div>
         </div>
         <div className="pt-2">
           <Button

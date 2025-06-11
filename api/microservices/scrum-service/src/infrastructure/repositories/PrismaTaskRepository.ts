@@ -29,7 +29,8 @@ export class PrismaTaskRepository implements TaskRepository {
       status: data.status,
       type: data.type,
       estimatedTime: data.estimatedTime,
-      dependencies: data.dependencies,
+      startedAt: data.startedAt,
+      finishedAt: data.finishedAt,
     };
     if (typeof userStoryId === "string") prismaData.userStoryId = userStoryId;
     const created = await prisma.task.create({
@@ -49,9 +50,17 @@ export class PrismaTaskRepository implements TaskRepository {
       status: data.status,
       type: data.type,
       estimatedTime: data.estimatedTime,
-      dependencies: data.dependencies,
     };
     if (typeof userStoryId === "string") prismaData.userStoryId = userStoryId;
+
+    const currentTask = await prisma.task.findUnique({ where: { id } });
+    if (data.status === "IN_PROGRESS" && !currentTask?.startedAt) {
+      prismaData.startedAt = new Date();
+    }
+    if (data.status === "DONE" && !currentTask?.finishedAt) {
+      prismaData.finishedAt = new Date();
+    }
+
     const updated = await prisma.task.update({
       where: { id },
       data: prismaData,
@@ -75,8 +84,9 @@ function mapPrismaTaskToDomain(prismaTask: any): Task {
     description: prismaTask.description ?? undefined,
     status: prismaTask.status as TaskStatus,
     dueDate: prismaTask.dueDate ?? undefined,
-    dependencies: prismaTask.dependencies ?? [],
     estimatedTime: prismaTask.estimatedTime ?? undefined,
+    startedAt: prismaTask.startedAt ?? undefined,
+    finishedAt: prismaTask.finishedAt ?? undefined,
     createdAt: prismaTask.createdAt,
     updatedAt: prismaTask.updatedAt,
     type: prismaTask.type as TaskType,

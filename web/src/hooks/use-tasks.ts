@@ -33,6 +33,10 @@ export type Task = {
     createdAt?: Date;
     updatedAt?: Date;
   };
+  startedAt?: string | Date;
+  finishedAt?: string | Date;
+  type?: string;
+  estimatedTime?: number;
 };
 
 export type TaskForm = {
@@ -41,6 +45,9 @@ export type TaskForm = {
   status: TaskStatus;
   category?: string;
   dueDate?: Date;
+  type?: string;
+  estimatedTime?: number;
+  // startedAt e finishedAt removidos do form, pois são setados pelo backend
   // dependencies?: string[]; // descomente se for usar no form
 };
 

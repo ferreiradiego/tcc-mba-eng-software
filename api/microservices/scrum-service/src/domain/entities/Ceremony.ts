@@ -15,7 +15,6 @@ export class Ceremony {
   endTime: Date;
   duration?: number;
   participants: string[];
-  timeLogs: string[];
   createdAt: Date;
   updatedAt: Date;
 
@@ -28,7 +27,6 @@ export class Ceremony {
     this.endTime = props.endTime;
     this.duration = props.duration;
     this.participants = props.participants;
-    this.timeLogs = props.timeLogs;
     this.createdAt = new Date();
     this.updatedAt = new Date();
   }

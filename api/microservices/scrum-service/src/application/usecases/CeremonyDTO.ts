@@ -8,7 +8,6 @@ export const CeremonySchema = z.object({
   startTime: z.coerce.date(),
   endTime: z.coerce.date(),
   participants: z.array(z.string()).optional(),
-  timeLogs: z.array(z.string()).optional(),
 }).superRefine((data, ctx) => {
   if (data.type === CeremonyType.OTHER && (!data.typeDesc || data.typeDesc.trim().length === 0)) {
     ctx.addIssue({
@@ -26,7 +25,6 @@ export const CeremonyUpdateSchema = z.object({
   startTime: z.coerce.date().optional(),
   endTime: z.coerce.date().optional(),
   participants: z.array(z.string()).optional(),
-  timeLogs: z.array(z.string()).optional(),
 }).superRefine((data, ctx) => {
   if (data.type === CeremonyType.OTHER && (!data.typeDesc || data.typeDesc.trim().length === 0)) {
     ctx.addIssue({

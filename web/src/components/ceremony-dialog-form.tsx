@@ -43,7 +43,6 @@ const CeremonySchema = z
     startTime: z.string(),
     endTime: z.string(),
     participants: z.array(z.string()).optional(),
-    timeLogs: z.array(z.string()).optional(),
   })
   .superRefine((data, ctx) => {
     if (
@@ -66,7 +65,6 @@ function getCeremonyDefaultValues(ceremony?: Ceremony): Partial<CeremonyForm> {
       typeDesc: "",
       scheduledAt: undefined,
       participants: [],
-      timeLogs: [],
       startTime: "",
       endTime: "",
     };
@@ -97,7 +95,6 @@ function getCeremonyDefaultValues(ceremony?: Ceremony): Partial<CeremonyForm> {
     startTime: parseTime(ceremony.startTime),
     endTime: parseTime(ceremony.endTime),
     participants: ceremony.participants || [],
-    timeLogs: ceremony.timeLogs || [],
   };
 }
 
@@ -163,7 +160,7 @@ export function CeremonyDialogForm({
     if (isEdit && ceremony) {
       await updateCeremony({ id: ceremony.id, data: payload });
     } else {
-      await createCeremony({ ...payload, participants: [], timeLogs: [] });
+      await createCeremony({ ...payload, participants: [] });
     }
     methods.reset();
     setOpen(false);

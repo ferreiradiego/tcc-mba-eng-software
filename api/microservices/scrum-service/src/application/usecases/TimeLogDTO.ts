@@ -6,5 +6,3 @@ export const TimeLogSchema = z.object({
   duration: z.number().int().positive().optional(),
   status: z.enum(['running', 'paused', 'stopped', 'finished']),
 });
-
-export type TimeLogDTO = z.infer<typeof TimeLogSchema>;

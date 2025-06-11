@@ -15,4 +15,6 @@ export interface Task {
   createdAt: Date;
   updatedAt: Date;
   type: TaskType;
+  startedAt?: Date;
+  finishedAt?: Date;
 }

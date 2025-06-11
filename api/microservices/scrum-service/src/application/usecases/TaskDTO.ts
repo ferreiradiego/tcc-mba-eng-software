@@ -8,9 +8,10 @@ export const TaskSchema = z.object({
   description: z.string().optional(),
   status: z.nativeEnum(TaskStatus),
   dueDate: z.coerce.date().optional(),
-  dependencies: z.array(z.string().uuid()).optional(),
   type: z.nativeEnum(TaskType),
   estimatedTime: z.number().int().positive().optional(),
+  startedAt: z.coerce.date().optional(),
+  finishedAt: z.coerce.date().optional(),
 });
 
 export type TaskDTO = z.infer<typeof TaskSchema>;

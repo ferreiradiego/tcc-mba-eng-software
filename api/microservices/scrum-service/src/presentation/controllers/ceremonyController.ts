@@ -21,7 +21,6 @@ export async function createCeremony(req: Request, res: Response) {
     participants: Array.isArray(req.body.participants)
       ? req.body.participants
       : [],
-    timeLogs: Array.isArray(req.body.timeLogs) ? req.body.timeLogs : [],
   };
 
   const ceremony = await ceremonyService.createCeremony(data);
@@ -37,7 +36,6 @@ export async function updateCeremony(req: Request, res: Response) {
     participants: Array.isArray(req.body.participants)
       ? req.body.participants
       : [],
-    timeLogs: Array.isArray(req.body.timeLogs) ? req.body.timeLogs : [],
   };
 
   const updated = await ceremonyService.updateCeremony(id, data);

@@ -29,7 +29,6 @@ const TaskSchema = z.object({
   description: z.string().optional(),
   status: z.nativeEnum(TaskStatus),
   dueDate: z.coerce.date().optional(),
-  dependencies: z.array(z.string()).optional(),
   userStoryId: z.string().optional(),
   type: z.string(),
   estimatedTime: z.coerce.number().int().positive().optional(),
@@ -155,6 +154,7 @@ export function TaskDialogForm({
                   label: us.title,
                 }))}
               />
+              {/* Campos de tempo removidos do formulário, pois são setados automaticamente pelo backend */}
               <Button
                 type="submit"
                 disabled={methods.formState.isSubmitting}

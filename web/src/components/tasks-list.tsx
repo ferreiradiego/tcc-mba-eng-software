@@ -3,19 +3,33 @@
 import { TaskDialogForm } from "@/components/task-dialog-form";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTasks, type Task } from "@/hooks/use-tasks";
+import { useUrlFilters } from "@/hooks/use-url-filters";
+import { cn } from "@/lib/utils";
 import {
-  format as formatDate,
-  isSameDay,
   addDays,
+  format,
+  format as formatDate,
   isAfter,
   isBefore,
-  format,
+  isSameDay,
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
-  AlertCircle,
   CalendarDays,
   CheckCircle2,
   Clock,
@@ -25,21 +39,6 @@ import {
   Trash2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useUrlFilters } from "@/hooks/use-url-filters";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
 
 function formatMinutes(min: number) {
   if (min >= 60) {
@@ -86,7 +85,7 @@ export default function TasksList() {
   const { tasks, loading, error, deleteTask } = useTasks();
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
-  const { filters, setFilter, clearFilters } = useUrlFilters([
+  const { filters, clearFilters, updatePath } = useUrlFilters([
     "status",
     "type",
     "dateFrom",
@@ -107,21 +106,15 @@ export default function TasksList() {
   });
 
   useEffect(() => {
-    setFilter("status", statusFilter !== "ALL" ? statusFilter : undefined);
-  }, [statusFilter]);
-  useEffect(() => {
-    setFilter("type", typeFilter !== "ALL" ? typeFilter : undefined);
-  }, [typeFilter]);
-  useEffect(() => {
-    setFilter(
-      "dateFrom",
-      dateRange.from ? dateRange.from.toISOString().slice(0, 10) : undefined
-    );
-    setFilter(
-      "dateTo",
-      dateRange.to ? dateRange.to.toISOString().slice(0, 10) : undefined
-    );
-  }, [dateRange]);
+    const { from, to } = dateRange;
+    const query: Record<string, string> = {};
+    if (statusFilter && statusFilter !== "ALL") query.status = statusFilter;
+    if (typeFilter && typeFilter !== "ALL") query.type = typeFilter;
+    if (from) query.dateFrom = from.toISOString().slice(0, 10);
+    if (to) query.dateTo = to.toISOString().slice(0, 10);
+    const params = new URLSearchParams(query).toString();
+    updatePath(params);
+  }, [statusFilter, typeFilter, dateRange, updatePath]);
 
   const filteredTasks = tasks.filter((task) => {
     const statusMatch = statusFilter === "ALL" || task.status === statusFilter;

@@ -45,15 +45,9 @@ export default function CeremoniesList() {
   const { ceremonies, loading, error, deleteCeremony } = useCeremonies();
   const [editingCeremony, setEditingCeremony] = useState<Ceremony | null>(null);
 
-  // Sincronização dos filtros com a URL
-  const { filters, setFilter, clearFilters } = useUrlFilters([
-    "type",
-    "status",
-    "dateFrom",
-    "dateTo",
-  ]);
+  const { filters, clearFilters,  updatePath } =
+    useUrlFilters(["type", "status", "dateFrom", "dateTo"]);
 
-  // Estado local sincronizado com a URL
   const [typeFilter, setTypeFilter] = useState<string>(filters.type || "ALL");
   const [statusFilter, setStatusFilter] = useState<string>(
     filters.status || "ALL"
@@ -66,24 +60,6 @@ export default function CeremoniesList() {
     const to = filters.dateTo ? new Date(filters.dateTo) : null;
     return { from, to };
   });
-
-  // Atualiza URL ao mudar filtros
-  useEffect(() => {
-    setFilter("type", typeFilter !== "ALL" ? typeFilter : undefined);
-  }, [typeFilter]);
-  useEffect(() => {
-    setFilter("status", statusFilter !== "ALL" ? statusFilter : undefined);
-  }, [statusFilter]);
-  useEffect(() => {
-    setFilter(
-      "dateFrom",
-      dateRange.from ? dateRange.from.toISOString().slice(0, 10) : undefined
-    );
-    setFilter(
-      "dateTo",
-      dateRange.to ? dateRange.to.toISOString().slice(0, 10) : undefined
-    );
-  }, [dateRange]);
 
   const typeMap: Record<
     string,
@@ -129,6 +105,19 @@ export default function CeremoniesList() {
     }
     return typeMatch && statusMatch && dateMatch;
   });
+
+  useEffect(() => {
+    const { from, to } = dateRange;
+    const query: Record<string, string> = {};
+    if (typeFilter && typeFilter !== "ALL") query.type = typeFilter;
+    if (statusFilter && statusFilter !== "ALL") query.status = statusFilter;
+    if (from) query.dateFrom = from.toISOString().slice(0, 10);
+    if (to) query.dateTo = to.toISOString().slice(0, 10);
+    const params = new URLSearchParams(query).toString();
+    
+    updatePath(params);
+
+  }, [typeFilter, statusFilter, dateRange, updatePath]);
 
   return (
     <>

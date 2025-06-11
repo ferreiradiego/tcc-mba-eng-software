@@ -128,7 +128,6 @@ export default function DashboardSummary() {
               selected={dateFromObj}
               onSelect={d => d && setDateFromObj(d)}
               disabled={d => d > dateToObj}
-              initialFocus
             />
           </PopoverContent>
         </Popover>
@@ -145,7 +144,6 @@ export default function DashboardSummary() {
               selected={dateToObj}
               onSelect={d => d && setDateToObj(d)}
               disabled={d => d < dateFromObj || d > new Date()}
-              initialFocus
             />
           </PopoverContent>
         </Popover>

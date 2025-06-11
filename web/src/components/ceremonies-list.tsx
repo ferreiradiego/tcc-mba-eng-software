@@ -10,6 +10,21 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+import { addDays, format as formatDate, isAfter, isBefore, isSameDay } from "date-fns";
+import { cn } from "@/lib/utils";
 
 function formatDuration(duration?: number): string | null {
   if (typeof duration !== "number" || duration <= 0) return null;
@@ -22,6 +37,15 @@ function formatDuration(duration?: number): string | null {
 export default function CeremoniesList() {
   const { ceremonies, loading, error, deleteCeremony } = useCeremonies();
   const [editingCeremony, setEditingCeremony] = useState<Ceremony | null>(null);
+  const [typeFilter, setTypeFilter] = useState<string>("ALL");
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
+  const [dateRange, setDateRange] = useState<{
+    from: Date | null;
+    to: Date | null;
+  }>({
+    from: null,
+    to: null,
+  });
 
   const typeMap: Record<
     string,
@@ -42,8 +66,97 @@ export default function CeremoniesList() {
     OTHER: { label: "Outro", icon: <Clock />, color: "text-gray-600" },
   };
 
+  const filteredCeremonies = ceremonies.filter((ceremony) => {
+    const isDone =
+      ceremony.scheduledAt && new Date(ceremony.scheduledAt) <= new Date();
+    const typeMatch =
+      typeFilter === "ALL" || ceremony.type === typeFilter;
+    const statusMatch =
+      statusFilter === "ALL" ||
+      (statusFilter === "REALIZADA" && isDone) ||
+      (statusFilter === "PENDENTE" && !isDone);
+    const scheduledDate = ceremony.scheduledAt ? new Date(ceremony.scheduledAt) : null;
+    let dateMatch = true;
+    if (dateRange.from && dateRange.to && scheduledDate) {
+      dateMatch =
+        (isSameDay(scheduledDate, dateRange.from) || isAfter(scheduledDate, dateRange.from)) &&
+        (isSameDay(scheduledDate, dateRange.to) || isBefore(scheduledDate, addDays(dateRange.to, 1)));
+    } else if (dateRange.from && scheduledDate) {
+      dateMatch = isSameDay(scheduledDate, dateRange.from) || isAfter(scheduledDate, dateRange.from);
+    }
+    return typeMatch && statusMatch && dateMatch;
+  });
+
   return (
     <>
+      {/* Filtros */}
+      <div className="flex flex-wrap gap-4 mb-4">
+        <div>
+          <Select value={typeFilter} onValueChange={setTypeFilter}>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">Todos os tipos</SelectItem>
+              <SelectItem value="DAILY">Daily</SelectItem>
+              <SelectItem value="PLANNING">Planning</SelectItem>
+              <SelectItem value="REVIEW">Review</SelectItem>
+              <SelectItem value="RETROSPECTIVE">Retrospective</SelectItem>
+              <SelectItem value="OTHER">Outro</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">Todos os status</SelectItem>
+              <SelectItem value="REALIZADA">Realizada</SelectItem>
+              <SelectItem value="PENDENTE">Pendente</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-[220px] justify-start text-left font-normal",
+                  !dateRange.from && !dateRange.to && "text-muted-foreground"
+                )}
+              >
+                {dateRange.from && dateRange.to
+                  ? `${formatDate(dateRange.from, "P", { locale: ptBR })} - ${formatDate(dateRange.to, "P", { locale: ptBR })}`
+                  : dateRange.from
+                  ? formatDate(dateRange.from, "P", { locale: ptBR })
+                  : "Filtrar por período"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="range"
+                selected={dateRange.from && dateRange.to ? { from: dateRange.from, to: dateRange.to } : undefined}
+                onSelect={(range) => setDateRange({ from: range?.from ?? null, to: range?.to ?? null })}
+                required={false}
+                initialFocus
+              />
+              {(dateRange.from || dateRange.to) && (
+                <Button
+                  variant="ghost"
+                  className="mt-2 w-full"
+                  onClick={() => setDateRange({ from: null, to: null })}
+                >
+                  Limpar filtro
+                </Button>
+              )}
+            </PopoverContent>
+          </Popover>
+        </div>
+      </div>
+
       {loading ? (
         <div className="flex flex-col gap-4">
           {[...Array(4)].map((_, i) => (
@@ -63,8 +176,8 @@ export default function CeremoniesList() {
         </div>
       ) : (
         <div className="flex flex-col gap-4">
-          {ceremonies.length > 0 ? (
-            ceremonies.map((ceremony) => {
+          {filteredCeremonies.length > 0 ? (
+            filteredCeremonies.map((ceremony) => {
               const type = typeMap[ceremony.type] || {
                 label: ceremony.type,
                 icon: <Clock />,

@@ -85,7 +85,6 @@ export function SprintForm({ onSubmit, loading, initialValues }: Props) {
                 mode="single"
                 selected={startDate}
                 onSelect={handleStartDate}
-                initialFocus
               />
             </PopoverContent>
           </Popover>
@@ -114,7 +113,6 @@ export function SprintForm({ onSubmit, loading, initialValues }: Props) {
                 mode="single"
                 selected={endDate}
                 onSelect={handleEndDate}
-                initialFocus
               />
             </PopoverContent>
           </Popover>

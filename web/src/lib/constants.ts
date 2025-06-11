@@ -11,16 +11,11 @@ const TASK_STATUS = [
   { value: "DONE", label: "Concluída" },
 ];
 
-const TASK_PRIORITY = [
-  { value: "LOW", label: "Baixa" },
-  { value: "MEDIUM", label: "Média" },
-  { value: "HIGH", label: "Alta" },
-];
-
 const TASK_TYPE = [
   { value: "FEATURE", label: "Funcionalidade" },
   { value: "IMPROVEMENT", label: "Melhoria" },
   { value: "BUG", label: "Bug" },
+  { value: "CODE_REVIEW", label: "Code Review" },
 ];
 
 const CEREMONY_TYPE = [
@@ -34,7 +29,6 @@ const CEREMONY_TYPE = [
 export {
   USER_STORY_STATUS,
   TASK_STATUS,
-  TASK_PRIORITY,
   TASK_TYPE,
   CEREMONY_TYPE,
 };

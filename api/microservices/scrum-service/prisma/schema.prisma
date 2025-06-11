@@ -56,16 +56,11 @@ enum TaskStatus {
   DONE
 }
 
-enum TaskPriority {
-  LOW
-  MEDIUM
-  HIGH
-}
-
 enum TaskType {
   BUG
   IMPROVEMENT
   FEATURE
+  CODE_REVIEW
 }
 
 model Task {
@@ -76,7 +71,6 @@ model Task {
   title         String
   description   String?
   status        TaskStatus
-  priority      TaskPriority
   type          TaskType
   dueDate       DateTime?
   dependencies  String[]

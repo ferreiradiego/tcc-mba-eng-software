@@ -1,6 +1,6 @@
 import type { Task } from "@domain/entities/Task";
 import { prisma } from "@infrastructure/prisma/client";
-import type { TaskPriority, TaskStatus, TaskType } from "@prisma/client";
+import type { TaskStatus, TaskType } from "@prisma/client";
 import { TaskRepository } from "./TaskRepository";
 
 export class PrismaTaskRepository implements TaskRepository {
@@ -13,23 +13,28 @@ export class PrismaTaskRepository implements TaskRepository {
   }
 
   async findById(id: string): Promise<Task | null> {
-    const task = await prisma.task.findUnique({ where: { id } });
+    const task = await prisma.task.findUnique({
+      where: { id },
+      include: { userStory: true },
+    });
     return task ? mapPrismaTaskToDomain(task) : null;
   }
 
   async create(
     task: Omit<Task, "id" | "createdAt" | "updatedAt">
   ): Promise<Task> {
-    const { userStory, ...data } = task;
+    const { userStory, userStoryId, ...data } = task;
+    const prismaData: any = {
+      ...data,
+      status: data.status,
+      type: data.type,
+      estimatedTime: data.estimatedTime,
+      dependencies: data.dependencies,
+    };
+    if (typeof userStoryId === "string") prismaData.userStoryId = userStoryId;
     const created = await prisma.task.create({
-      data: {
-        ...data,
-        status: data.status,
-        priority: data.priority,
-        type: data.type,
-        estimatedTime: data.estimatedTime,
-        dependencies: data.dependencies ?? [],
-      },
+      data: prismaData,
+      include: { userStory: true },
     });
     return mapPrismaTaskToDomain(created);
   }
@@ -38,17 +43,19 @@ export class PrismaTaskRepository implements TaskRepository {
     id: string,
     task: Partial<Omit<Task, "id" | "userId" | "createdAt" | "updatedAt">>
   ): Promise<Task | null> {
-    const { userStory, ...data } = task;
+    const { userStory, userStoryId, ...data } = task;
+    const prismaData: any = {
+      ...data,
+      status: data.status,
+      type: data.type,
+      estimatedTime: data.estimatedTime,
+      dependencies: data.dependencies,
+    };
+    if (typeof userStoryId === "string") prismaData.userStoryId = userStoryId;
     const updated = await prisma.task.update({
       where: { id },
-      data: {
-        ...data,
-        status: data.status,
-        priority: data.priority,
-        type: data.type,
-        estimatedTime: data.estimatedTime,
-        dependencies: data.dependencies,
-      },
+      data: prismaData,
+      include: { userStory: true },
     });
     return mapPrismaTaskToDomain(updated);
   }
@@ -67,7 +74,6 @@ function mapPrismaTaskToDomain(prismaTask: any): Task {
     title: prismaTask.title,
     description: prismaTask.description ?? undefined,
     status: prismaTask.status as TaskStatus,
-    priority: prismaTask.priority as TaskPriority,
     dueDate: prismaTask.dueDate ?? undefined,
     dependencies: prismaTask.dependencies ?? [],
     estimatedTime: prismaTask.estimatedTime ?? undefined,

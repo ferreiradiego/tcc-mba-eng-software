@@ -15,9 +15,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { Task, useTasks } from "@/hooks/use-tasks";
+import { Task, TaskStatus, useTasks } from "@/hooks/use-tasks";
 import { useUserStories } from "@/hooks/use-user-stories";
-import { TASK_PRIORITY, TASK_STATUS, TASK_TYPE } from "@/lib/constants";
+import { TASK_STATUS, TASK_TYPE } from "@/lib/constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, PlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -27,12 +27,12 @@ import { z } from "zod";
 const TaskSchema = z.object({
   title: z.string().min(2, "Título obrigatório"),
   description: z.string().optional(),
-  status: z.enum(["todo", "in_progress", "done"]),
-  priority: z.enum(["low", "medium", "high"]),
-  category: z.string().optional(),
+  status: z.nativeEnum(TaskStatus),
   dueDate: z.coerce.date().optional(),
-  userStoryId: z.string().uuid().optional(),
-  type: z.enum(["bug", "improvement", "feature"]), // campo type obrigatório
+  dependencies: z.array(z.string()).optional(),
+  userStoryId: z.string().optional(),
+  type: z.string(),
+  estimatedTime: z.coerce.number().int().positive().optional(),
 });
 type TaskForm = z.infer<typeof TaskSchema>;
 
@@ -60,8 +60,7 @@ export function TaskDialogForm({
             undefined,
         }
       : {
-          status: "todo",
-          priority: "medium",
+          status: TaskStatus.TODO,
         },
   });
 
@@ -131,36 +130,31 @@ export function TaskDialogForm({
               <ControlledInput name="title" label="Título" required />
               <ControlledTextArea name="description" label="Descrição" />
               <ControlledSelect
+                name="status"
+                label="Status"
+                options={TASK_STATUS}
+                required
+              />
+              <ControlledSelect
+                name="type"
+                label="Tipo"
+                options={TASK_TYPE}
+                required
+              />
+              <ControlledDatePicker name="dueDate" label="Data de entrega" />
+              <ControlledInput
+                name="estimatedTime"
+                label="Tempo estimado (min)"
+                type="number"
+              />
+              <ControlledSelect
                 name="userStoryId"
                 label="User Story"
                 options={userStories.map((us) => ({
                   value: us.id,
                   label: us.title,
                 }))}
-                className="w-full"
               />
-              <ControlledSelect
-                name="type"
-                label="Tipo"
-                required
-                options={TASK_TYPE}
-                className="w-full"
-              />
-              <ControlledSelect
-                name="status"
-                label="Status"
-                required
-                options={TASK_STATUS}
-              />
-              <ControlledSelect
-                name="priority"
-                label="Prioridade"
-                required
-                options={TASK_PRIORITY}
-              />
-              <ControlledInput name="category" label="Categoria" />
-              <ControlledDatePicker name="dueDate" label="Prazo" />
-
               <Button
                 type="submit"
                 disabled={methods.formState.isSubmitting}
@@ -168,8 +162,10 @@ export function TaskDialogForm({
               >
                 {methods.formState.isSubmitting ? (
                   <Loader2 className="animate-spin" />
-                ) : (
+                ) : isEdit ? (
                   "Salvar"
+                ) : (
+                  "Criar Tarefa"
                 )}
               </Button>
             </form>

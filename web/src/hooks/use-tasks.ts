@@ -4,13 +4,18 @@ import api from "@/lib/api";
 import { queryClient } from "@/lib/react-query-client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
+export enum TaskStatus {
+  TODO = "TODO",
+  IN_PROGRESS = "IN_PROGRESS",
+  DONE = "DONE",
+}
+
 export type Task = {
   id: string;
   userId: string;
   title: string;
   description?: string;
-  status: "todo" | "in_progress" | "done";
-  priority: "low" | "medium" | "high";
+  status: TaskStatus;
   category?: string;
   dueDate?: string | Date;
   dependencies?: string[];
@@ -33,8 +38,7 @@ export type Task = {
 export type TaskForm = {
   title: string;
   description?: string;
-  status: "todo" | "in_progress" | "done";
-  priority: "low" | "medium" | "high";
+  status: TaskStatus;
   category?: string;
   dueDate?: Date;
   // dependencies?: string[]; // descomente se for usar no form

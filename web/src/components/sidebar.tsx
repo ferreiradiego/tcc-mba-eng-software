@@ -22,15 +22,15 @@ import Link from "next/link";
 
 const nav = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
-  { href: "/dashboard/user-stories", label: "User Stories", icon: FileText },
-  { href: "/dashboard/tasks", label: "Tarefas", icon: ListChecks },
-  { href: "/dashboard/ceremonies", label: "Cerimônias", icon: Users },
-  { href: "/dashboard/reports", label: "Relatórios", icon: FileText },
   {
     href: "/dashboard/trimesters",
     label: "Trimestres & Sprints",
     icon: ListChecks,
   },
+  { href: "/dashboard/user-stories", label: "User Stories", icon: FileText },
+  { href: "/dashboard/tasks", label: "Tarefas", icon: ListChecks },
+  { href: "/dashboard/ceremonies", label: "Cerimônias", icon: Users },
+  { href: "/dashboard/reports", label: "Relatórios", icon: FileText },
 ];
 
 export function Sidebar() {

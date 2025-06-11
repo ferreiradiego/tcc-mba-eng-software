@@ -5,7 +5,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTasks, type Task } from "@/hooks/use-tasks";
-import { format } from "date-fns";
+import {
+  format as formatDate,
+  isSameDay,
+  addDays,
+  isAfter,
+  isBefore,
+  format,
+} from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
   AlertCircle,
@@ -17,7 +24,22 @@ import {
   Timer,
   Trash2,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useUrlFilters } from "@/hooks/use-url-filters";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 function formatMinutes(min: number) {
   if (min >= 60) {
@@ -64,7 +86,63 @@ export default function TasksList() {
   const { tasks, loading, error, deleteTask } = useTasks();
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
-  const grouped = tasks.reduce((acc: Record<string, Task[]>, task) => {
+  const { filters, setFilter, clearFilters } = useUrlFilters([
+    "status",
+    "type",
+    "dateFrom",
+    "dateTo",
+  ]);
+
+  const [statusFilter, setStatusFilter] = useState<string>(
+    filters.status || "ALL"
+  );
+  const [typeFilter, setTypeFilter] = useState<string>(filters.type || "ALL");
+  const [dateRange, setDateRange] = useState<{
+    from: Date | null;
+    to: Date | null;
+  }>(() => {
+    const from = filters.dateFrom ? new Date(filters.dateFrom) : null;
+    const to = filters.dateTo ? new Date(filters.dateTo) : null;
+    return { from, to };
+  });
+
+  useEffect(() => {
+    setFilter("status", statusFilter !== "ALL" ? statusFilter : undefined);
+  }, [statusFilter]);
+  useEffect(() => {
+    setFilter("type", typeFilter !== "ALL" ? typeFilter : undefined);
+  }, [typeFilter]);
+  useEffect(() => {
+    setFilter(
+      "dateFrom",
+      dateRange.from ? dateRange.from.toISOString().slice(0, 10) : undefined
+    );
+    setFilter(
+      "dateTo",
+      dateRange.to ? dateRange.to.toISOString().slice(0, 10) : undefined
+    );
+  }, [dateRange]);
+
+  const filteredTasks = tasks.filter((task) => {
+    const statusMatch = statusFilter === "ALL" || task.status === statusFilter;
+    const typeMatch = typeFilter === "ALL" || task.type === typeFilter;
+    const startedDate = task.startedAt ? new Date(task.startedAt) : null;
+    let dateMatch = true;
+    if (dateRange.from && dateRange.to && startedDate) {
+      dateMatch =
+        (isSameDay(startedDate, dateRange.from) ||
+          isAfter(startedDate, dateRange.from)) &&
+        (isSameDay(startedDate, dateRange.to) ||
+          isBefore(startedDate, addDays(dateRange.to, 1)));
+    } else if (dateRange.from && startedDate) {
+      dateMatch =
+        isSameDay(startedDate, dateRange.from) ||
+        isAfter(startedDate, dateRange.from);
+    }
+    return statusMatch && typeMatch && dateMatch;
+  });
+
+  const grouped = filteredTasks.reduce((acc: Record<string, Task[]>, task) => {
     const date = task.startedAt
       ? new Date(task.startedAt).toLocaleDateString()
       : "Sem data";
@@ -87,6 +165,98 @@ export default function TasksList() {
 
   return (
     <>
+      <div className="flex flex-wrap gap-4 mb-4 items-center">
+        <div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">Todos os status</SelectItem>
+              <SelectItem value="TODO">A Fazer</SelectItem>
+              <SelectItem value="IN_PROGRESS">Em Progresso</SelectItem>
+              <SelectItem value="DONE">Concluída</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Select value={typeFilter} onValueChange={setTypeFilter}>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">Todos os tipos</SelectItem>
+              <SelectItem value="BUG">Bug</SelectItem>
+              <SelectItem value="IMPROVEMENT">Melhoria</SelectItem>
+              <SelectItem value="FEATURE">Funcionalidade</SelectItem>
+              <SelectItem value="CODE_REVIEW">Revisão de Código</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-[220px] justify-start text-left font-normal",
+                  !dateRange.from && !dateRange.to && "text-muted-foreground"
+                )}
+              >
+                {dateRange.from && dateRange.to
+                  ? `${formatDate(dateRange.from, "P", {
+                      locale: ptBR,
+                    })} - ${formatDate(dateRange.to, "P", { locale: ptBR })}`
+                  : dateRange.from
+                  ? formatDate(dateRange.from, "P", { locale: ptBR })
+                  : "Filtrar por período"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="range"
+                selected={
+                  dateRange.from && dateRange.to
+                    ? { from: dateRange.from, to: dateRange.to }
+                    : undefined
+                }
+                onSelect={(range) =>
+                  setDateRange({
+                    from: range?.from ?? null,
+                    to: range?.to ?? null,
+                  })
+                }
+                required={false}
+              />
+              {(dateRange.from || dateRange.to) && (
+                <Button
+                  variant="ghost"
+                  className="mt-2 w-full"
+                  onClick={() => {
+                    setDateRange({ from: null, to: null });
+                    clearFilters();
+                  }}
+                >
+                  Limpar período
+                </Button>
+              )}
+            </PopoverContent>
+          </Popover>
+        </div>
+        <Button
+          variant="ghost"
+          className="h-9"
+          onClick={() => {
+            setStatusFilter("ALL");
+            setTypeFilter("ALL");
+            setDateRange({ from: null, to: null });
+            clearFilters();
+          }}
+        >
+          Limpar todos os filtros
+        </Button>
+      </div>
+
       {loading ? (
         <div className="space-y-2">
           {[...Array(4)].map((_, i) => (
@@ -100,7 +270,7 @@ export default function TasksList() {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-4">
           {sortedDates.map((date) => (
             <div
               key={date}

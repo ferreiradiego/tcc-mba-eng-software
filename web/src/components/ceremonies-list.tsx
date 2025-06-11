@@ -45,8 +45,12 @@ export default function CeremoniesList() {
   const { ceremonies, loading, error, deleteCeremony } = useCeremonies();
   const [editingCeremony, setEditingCeremony] = useState<Ceremony | null>(null);
 
-  const { filters, clearFilters,  updatePath } =
-    useUrlFilters(["type", "status", "dateFrom", "dateTo"]);
+  const { filters, clearFilters, updatePath } = useUrlFilters([
+    "type",
+    "status",
+    "dateFrom",
+    "dateTo",
+  ]);
 
   const [typeFilter, setTypeFilter] = useState<string>(filters.type || "ALL");
   const [statusFilter, setStatusFilter] = useState<string>(
@@ -114,9 +118,8 @@ export default function CeremoniesList() {
     if (from) query.dateFrom = from.toISOString().slice(0, 10);
     if (to) query.dateTo = to.toISOString().slice(0, 10);
     const params = new URLSearchParams(query).toString();
-    
-    updatePath(params);
 
+    updatePath(params);
   }, [typeFilter, statusFilter, dateRange, updatePath]);
 
   return (
@@ -344,6 +347,17 @@ export default function CeremoniesList() {
         />
       )}
       {error && <div className="text-red-500 text-sm text-center">{error}</div>}
+
+      {filteredCeremonies.length > 0 && (
+        <div className="flex items-center justify-start mt-4 text-base text-purple-900 font-medium gap-2 border-t pt-4">
+          Tempo total das cerimônias:
+          <span>
+            {formatDuration(
+              filteredCeremonies.reduce((acc, c) => acc + (c.duration || 0), 0)
+            )}
+          </span>
+        </div>
+      )}
     </>
   );
 }

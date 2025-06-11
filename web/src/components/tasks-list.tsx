@@ -1,19 +1,21 @@
 "use client";
 
 import { TaskDialogForm } from "@/components/task-dialog-form";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
 import { useTasks, type Task } from "@/hooks/use-tasks";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import {
-  FilePen,
-  Trash2,
+  AlertCircle,
   CalendarDays,
   CheckCircle2,
-  PlayCircle,
   Clock,
+  FilePen,
+  PlayCircle,
   Timer,
-  AlertCircle,
+  Trash2,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -36,6 +38,27 @@ function getDuration(task: Task) {
   }
   return null;
 }
+
+const TASK_STATUS_MAP: Record<
+  string,
+  { icon: JSX.Element; badgeColor: string; label: string }
+> = {
+  TODO: {
+    icon: <Clock className="w-4 h-4 text-blue-500" />,
+    badgeColor: "bg-blue-100 text-blue-800",
+    label: "A Fazer",
+  },
+  IN_PROGRESS: {
+    icon: <PlayCircle className="w-4 h-4 text-yellow-500" />,
+    badgeColor: "bg-yellow-100 text-yellow-800",
+    label: "Em Progresso",
+  },
+  DONE: {
+    icon: <CheckCircle2 className="w-4 h-4 text-green-600" />,
+    badgeColor: "bg-green-100 text-green-800",
+    label: "Concluída",
+  },
+};
 
 export default function TasksList() {
   const { tasks, loading, error, deleteTask } = useTasks();
@@ -86,7 +109,9 @@ export default function TasksList() {
               <div className="flex items-center gap-2 mb-3">
                 <CalendarDays className="w-4 h-4 text-muted-foreground" />
                 <span className="font-semibold text-base text-muted-foreground">
-                  {date}
+                  {date !== "Sem data"
+                    ? format(new Date(date), "P", { locale: ptBR })
+                    : date}
                 </span>
                 <Badge variant="secondary">
                   {grouped[date].length} tarefas
@@ -94,29 +119,15 @@ export default function TasksList() {
               </div>
               <div className="divide-y">
                 {grouped[date].map((task) => {
-                  let statusIcon = <Clock className="w-4 h-4 text-blue-500" />;
-                  let badgeColor = "bg-blue-100 text-blue-800";
-                  let statusLabel = "A Fazer";
-                  if (task.status === "IN_PROGRESS") {
-                    statusIcon = (
-                      <PlayCircle className="w-4 h-4 text-yellow-500" />
-                    );
-                    badgeColor = "bg-yellow-100 text-yellow-800";
-                    statusLabel = "Em Progresso";
-                  } else if (task.status === "DONE") {
-                    statusIcon = (
-                      <CheckCircle2 className="w-4 h-4 text-green-600" />
-                    );
-                    badgeColor = "bg-green-100 text-green-800";
-                    statusLabel = "Concluída";
-                  }
+                  const status =
+                    TASK_STATUS_MAP[task.status] || TASK_STATUS_MAP["TODO"];
                   return (
                     <div
                       key={task.id}
                       className="py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 min-w-0 hover:bg-muted/40 rounded transition"
                     >
                       <div className="flex items-center gap-2 min-w-0 flex-1">
-                        {statusIcon}
+                        {status.icon}
                         <span className="font-medium truncate">
                           {task.title}
                           {task?.userStory && (
@@ -125,8 +136,8 @@ export default function TasksList() {
                             </span>
                           )}
                         </span>
-                        <Badge className={badgeColor + " ml-2"}>
-                          {statusLabel}
+                        <Badge className={status.badgeColor + " ml-2"}>
+                          {status.label}
                         </Badge>
 
                         {task.type && (

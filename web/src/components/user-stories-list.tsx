@@ -63,7 +63,7 @@ export default function UserStoriesList() {
               key={trimesterLabel}
               className="mb-6 rounded-xl border bg-card p-4 shadow-sm"
             >
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center justify-between mb-2">
                 <span className="font-semibold text-lg text-primary">
                   {trimesterLabel}
                 </span>
@@ -81,7 +81,7 @@ export default function UserStoriesList() {
               <div className="space-y-6 ml-2">
                 {Object.entries(sprints).map(([sprintName, stories]) => (
                   <div key={sprintName} className="mb-1">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center justify-between mb-1">
                       <span className="font-medium text-sm text-muted-foreground">
                         {sprintName}
                       </span>
@@ -96,21 +96,13 @@ export default function UserStoriesList() {
                       {stories.map((story) => (
                         <div
                           key={story.id}
-                          className="py-3 flex items-center justify-between px-3 hover:bg-muted/60 transition-colors rounded-md"
+                          className="py-5 flex items-center justify-between px-3 hover:bg-muted/60 transition-colors rounded-md"
                         >
                           <div className="flex flex-col gap-0.5">
-                            <span className="font-medium text-base text-primary">
-                              {story.title}
-                            </span>
-                            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
-                              <Badge
-                                variant={
-                                  statusMap[story.status]?.variant || "default"
-                                }
-                                className="px-2 py-0.5 rounded"
-                              >
-                                {statusMap[story.status]?.label || story.status}
-                              </Badge>
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-base text-primary">
+                                {story.title}
+                              </span>
                               {story.blocked && (
                                 <Badge
                                   variant="destructive"
@@ -119,8 +111,18 @@ export default function UserStoriesList() {
                                   Bloqueada
                                 </Badge>
                               )}
+                            </div>
+                            <div className="flex flex-wrap items-center gap-2 mt-1">
+                              <Badge
+                                variant={
+                                  statusMap[story.status]?.variant || "default"
+                                }
+                                className="px-2 py-0.5 rounded"
+                              >
+                                {statusMap[story.status]?.label || story.status}
+                              </Badge>
                               {story.sprint?.startDate && (
-                                <span>
+                                <span className="text-xs text-muted-foreground">
                                   {new Date(
                                     story.sprint.startDate
                                   ).toLocaleDateString("pt-BR")}

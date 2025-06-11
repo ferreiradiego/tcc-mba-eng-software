@@ -41,13 +41,25 @@ export class PrismaUserStoryRepository implements UserStoryRepository {
   async findById(id: string): Promise<UserStory | null> {
     const found = await prisma.userStory.findUnique({
       where: { id },
-      include: { sprint: true },
+      include: {
+        sprint: {
+          include: {
+            trimester: true,
+          },
+        },
+      },
     });
     return found ? toUserStory(found) : null;
   }
   async findAll(): Promise<UserStory[]> {
     const all = await prisma.userStory.findMany({
-      include: { sprint: true },
+      include: {
+        sprint: {
+          include: {
+            trimester: true,
+          },
+        },
+      },
     });
 
     return all.map(toUserStory);

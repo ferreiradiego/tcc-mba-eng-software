@@ -1,12 +1,19 @@
 import api from "@/lib/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+export interface Trimester {
+  id: string;
+  year: number;
+  number: number;
+}
+
 export interface Sprint {
   id: string;
   name: string;
   startDate: string;
   endDate: string;
   trimesterId: string;
+  trimester?: Trimester;
 }
 
 export interface UserStory {

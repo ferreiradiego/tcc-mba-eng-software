@@ -1,16 +1,33 @@
 import { UserStory } from "../../../domain/entities/UserStory";
+import { Sprint } from "../../../domain/entities/Sprint";
+import { Trimester } from "../../../domain/entities/Trimester";
 
 export function toUserStory(prismaUserStory: any): UserStory {
+  let trimester;
+  if (
+    prismaUserStory.sprint &&
+    prismaUserStory.sprint.trimester &&
+    typeof prismaUserStory.sprint.trimester === "object"
+  ) {
+    trimester = new Trimester(
+      prismaUserStory.sprint.trimester.id,
+      prismaUserStory.sprint.trimester.year,
+      prismaUserStory.sprint.trimester.number
+    );
+  }
+
   const sprint =
     prismaUserStory.sprint && typeof prismaUserStory.sprint === "object"
-      ? {
-          id: prismaUserStory.sprint.id,
-          name: prismaUserStory.sprint.name,
-          startDate: prismaUserStory.sprint.startDate,
-          endDate: prismaUserStory.sprint.endDate,
-          trimesterId: prismaUserStory.sprint.trimesterId,
-        }
+      ? new Sprint(
+          prismaUserStory.sprint.id,
+          prismaUserStory.sprint.name,
+          prismaUserStory.sprint.startDate,
+          prismaUserStory.sprint.endDate,
+          prismaUserStory.sprint.trimesterId,
+          trimester
+        )
       : undefined;
+
   return new UserStory(
     prismaUserStory.id,
     prismaUserStory.title,

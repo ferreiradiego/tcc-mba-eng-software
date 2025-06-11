@@ -11,13 +11,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useTrimesters } from "@/hooks/use-trimesters";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useSprints } from "@/hooks/use-sprints";
-import { Plus, Trash2, Edit2 } from "lucide-react";
+import { useTrimesters } from "@/hooks/use-trimesters";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { Edit2, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ptBR } from "date-fns/locale";
-import { format } from "date-fns";
 
 export default function TrimestersSprintsPage() {
   const [openTrimester, setOpenTrimester] = useState(false);
@@ -101,9 +102,11 @@ export default function TrimestersSprintsPage() {
     }
   }
 
-  async function handleEditSprint(
-    data: { name: string; startDate: string; endDate: string }
-  ) {
+  async function handleEditSprint(data: {
+    name: string;
+    startDate: string;
+    endDate: string;
+  }) {
     if (!editSprint) return;
     setLoadingSprint(true);
     try {
@@ -115,9 +118,7 @@ export default function TrimestersSprintsPage() {
       setEditSprint(null);
     } catch (err: any) {
       toast.error(
-        err?.response?.data?.message ||
-          err.message ||
-          "Erro ao editar sprint"
+        err?.response?.data?.message || err.message || "Erro ao editar sprint"
       );
     } finally {
       setLoadingSprint(false);
@@ -187,7 +188,37 @@ export default function TrimestersSprintsPage() {
           </Dialog>
         </div>
         {loadingList ? (
-          <div>Carregando...</div>
+          <ul className="space-y-4">
+            {[1, 2].map((_, i) => (
+              <li key={i} className="border rounded p-3 bg-muted">
+                <div className="flex items-center justify-between mb-2">
+                  <Skeleton className="h-6 w-40" />
+                  <div className="flex gap-2">
+                    <Skeleton className="h-8 w-24" />
+                    <Skeleton className="h-8 w-8" />
+                    <Skeleton className="h-8 w-8" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 gap-2 mt-2">
+                  {[1, 2].map((_, j) => (
+                    <div
+                      key={j}
+                      className="rounded border bg-white p-2 flex items-center justify-between shadow-sm"
+                    >
+                      <div>
+                        <Skeleton className="h-4 w-32 mb-1" />
+                        <Skeleton className="h-3 w-24" />
+                      </div>
+                      <div className="flex gap-1">
+                        <Skeleton className="h-8 w-8" />
+                        <Skeleton className="h-8 w-8" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </li>
+            ))}
+          </ul>
         ) : errorList ? (
           <div className="text-red-500">{errorList}</div>
         ) : trimesters.length === 0 ? (
@@ -256,8 +287,13 @@ export default function TrimestersSprintsPage() {
                             <div>
                               <span className="font-medium">{s.name}</span>
                               <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
-                                {format(new Date(s.startDate), "P", { locale: ptBR })} -{" "}
-                                {format(new Date(s.endDate), "P", { locale: ptBR })}
+                                {format(new Date(s.startDate), "P", {
+                                  locale: ptBR,
+                                })}{" "}
+                                -{" "}
+                                {format(new Date(s.endDate), "P", {
+                                  locale: ptBR,
+                                })}
                               </span>
                             </div>
                             <div className="flex gap-1">
@@ -307,8 +343,11 @@ export default function TrimestersSprintsPage() {
           </ul>
         )}
       </Card>
-      {/* Editar Sprint Dialog */}
-      <Dialog open={!!editSprint} onOpenChange={(v) => !v && setEditSprint(null)}>
+
+      <Dialog
+        open={!!editSprint}
+        onOpenChange={(v) => !v && setEditSprint(null)}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Editar Sprint</DialogTitle>

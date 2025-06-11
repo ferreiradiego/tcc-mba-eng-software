@@ -1,11 +1,11 @@
 "use client";
 
 import {
+  ControlledCheckbox,
   ControlledDatePicker,
   ControlledInput,
   ControlledSelect,
   ControlledTextArea,
-  ControlledCheckbox,
 } from "@/components/controlled-fields";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +15,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useUserStories, UserStory } from "@/hooks/use-user-stories";
+import { useSprints } from "@/hooks/use-sprints";
+import { UserStory, useUserStories } from "@/hooks/use-user-stories";
+import { USER_STORY_STATUS } from "@/lib/constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, PlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -43,6 +45,7 @@ export function UserStoryDialogForm({
   const isEdit = !!userStory;
   const [open, setOpen] = useState(false);
   const { createUserStory, updateUserStory } = useUserStories();
+  const { sprints, loading: loadingSprints } = useSprints();
   const methods = useForm<UserStoryForm>({
     resolver: zodResolver(UserStorySchema),
     defaultValues: userStory
@@ -77,7 +80,9 @@ export function UserStoryDialogForm({
   async function onSubmit(data: UserStoryForm) {
     const payload = {
       ...data,
-      activationDate: data.activationDate ? data.activationDate.toISOString() : undefined,
+      activationDate: data.activationDate
+        ? data.activationDate.toISOString()
+        : undefined,
     };
     if (isEdit && userStory) {
       await updateUserStory.mutateAsync({ id: userStory.id, data: payload });
@@ -101,7 +106,9 @@ export function UserStoryDialogForm({
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{isEdit ? "Editar User Story" : "Nova User Story"}</DialogTitle>
+          <DialogTitle>
+            {isEdit ? "Editar User Story" : "Nova User Story"}
+          </DialogTitle>
         </DialogHeader>
         {methods.formState.isSubmitting ? (
           <div className="py-8 text-center text-muted-foreground">
@@ -109,21 +116,32 @@ export function UserStoryDialogForm({
           </div>
         ) : (
           <FormProvider {...methods}>
-            <form className="space-y-4" onSubmit={methods.handleSubmit(onSubmit)}>
+            <form
+              className="space-y-4"
+              onSubmit={methods.handleSubmit(onSubmit)}
+            >
               <ControlledInput name="title" label="Título" required />
               <ControlledTextArea name="description" label="Descrição" />
               <ControlledSelect
                 name="status"
                 label="Status"
                 required
+                options={USER_STORY_STATUS}
+              />
+              <ControlledSelect
+                name="sprintCode"
+                label="Sprint"
                 options={[
-                  { value: "todo", label: "A Fazer" },
-                  { value: "in_progress", label: "Em Progresso" },
-                  { value: "done", label: "Concluída" },
+                  ...sprints.map((s: any) => ({
+                    value: s.id,
+                    label: s.name,
+                  })),
                 ]}
               />
-              <ControlledInput name="sprintCode" label="Sprint" />
-              <ControlledDatePicker name="activationDate" label="Data de Ativação" />
+              <ControlledDatePicker
+                name="activationDate"
+                label="Data de Ativação"
+              />
               <ControlledCheckbox name="blocked" label="Bloqueada" />
               <Button
                 type="submit"

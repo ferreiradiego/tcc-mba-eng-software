@@ -17,6 +17,7 @@ import {
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { Task, useTasks } from "@/hooks/use-tasks";
 import { useUserStories } from "@/hooks/use-user-stories";
+import { TASK_PRIORITY, TASK_STATUS, TASK_TYPE } from "@/lib/constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, PlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -53,7 +54,10 @@ export function TaskDialogForm({
       ? {
           ...task,
           dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
-          userStoryId: (task as any).userStoryId || (task as any).userStory?.id || undefined,
+          userStoryId:
+            (task as any).userStoryId ||
+            (task as any).userStory?.id ||
+            undefined,
         }
       : {
           status: "todo",
@@ -129,39 +133,30 @@ export function TaskDialogForm({
               <ControlledSelect
                 name="userStoryId"
                 label="User Story"
-                options={userStories.map((us) => ({ value: us.id, label: us.title }))}
+                options={userStories.map((us) => ({
+                  value: us.id,
+                  label: us.title,
+                }))}
                 className="w-full"
               />
               <ControlledSelect
                 name="type"
                 label="Tipo"
                 required
-                options={[
-                  { value: "feature", label: "Funcionalidade" },
-                  { value: "improvement", label: "Melhoria" },
-                  { value: "bug", label: "Bug" },
-                ]}
+                options={TASK_TYPE}
                 className="w-full"
               />
               <ControlledSelect
                 name="status"
                 label="Status"
                 required
-                options={[
-                  { value: "todo", label: "A Fazer" },
-                  { value: "in_progress", label: "Em Progresso" },
-                  { value: "done", label: "Concluída" },
-                ]}
+                options={TASK_STATUS}
               />
               <ControlledSelect
                 name="priority"
                 label="Prioridade"
                 required
-                options={[
-                  { value: "low", label: "Baixa" },
-                  { value: "medium", label: "Média" },
-                  { value: "high", label: "Alta" },
-                ]}
+                options={TASK_PRIORITY}
               />
               <ControlledInput name="category" label="Categoria" />
               <ControlledDatePicker name="dueDate" label="Prazo" />

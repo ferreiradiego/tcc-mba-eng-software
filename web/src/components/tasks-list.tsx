@@ -49,17 +49,6 @@ function formatMinutes(min: number) {
   return `${min}m`;
 }
 
-function getDuration(task: Task) {
-  if (task.startedAt && task.finishedAt) {
-    const start = new Date(task.startedAt).getTime();
-    const end = new Date(task.finishedAt).getTime();
-    if (!isNaN(start) && !isNaN(end) && end > start) {
-      return Math.round((end - start) / 60000);
-    }
-  }
-  return null;
-}
-
 const TASK_STATUS_MAP: Record<
   string,
   { icon: JSX.Element; badgeColor: string; label: string }
@@ -135,19 +124,16 @@ export default function TasksList() {
     return statusMatch && typeMatch && dateMatch;
   });
 
-  const grouped = filteredTasks.reduce((acc: Record<string, Task[]>, task) => {
-    const date = task.startedAt
-      ? new Date(task.startedAt).toLocaleDateString()
-      : "Sem data";
-    if (!acc[date]) acc[date] = [];
-    acc[date].push(task);
-    return acc;
-  }, {});
-  const sortedDates = Object.keys(grouped).sort((a, b) => {
-    if (a === "Sem data") return 1;
-    if (b === "Sem data") return -1;
-    return new Date(b).getTime() - new Date(a).getTime();
-  });
+  const groupedByUS = filteredTasks.reduce(
+    (acc: Record<string, Task[]>, task) => {
+      const usTitle = task.userStory?.title || "Sem US";
+      if (!acc[usTitle]) acc[usTitle] = [];
+      acc[usTitle].push(task);
+      return acc;
+    },
+    {}
+  );
+  const sortedUSTitles = Object.keys(groupedByUS);
 
   const TASK_TYPE_LABELS: Record<string, string> = {
     BUG: "Bug",
@@ -264,24 +250,21 @@ export default function TasksList() {
         </div>
       ) : (
         <div className="flex flex-col gap-4">
-          {sortedDates.map((date) => (
+          {sortedUSTitles.map((usTitle) => (
             <div
-              key={date}
+              key={usTitle}
               className="rounded-lg border bg-white/80 dark:bg-zinc-900/80 shadow p-4"
             >
               <div className="flex items-center gap-2 mb-3">
-                <CalendarDays className="w-4 h-4 text-muted-foreground" />
                 <span className="font-semibold text-base text-muted-foreground">
-                  {date !== "Sem data"
-                    ? format(new Date(date), "P", { locale: ptBR })
-                    : date}
+                  {usTitle}
                 </span>
                 <Badge variant="secondary">
-                  {grouped[date].length} tarefas
+                  {groupedByUS[usTitle].length} tarefa(s)
                 </Badge>
               </div>
               <div className="divide-y">
-                {grouped[date].map((task) => {
+                {groupedByUS[usTitle].map((task) => {
                   const status =
                     TASK_STATUS_MAP[task.status] || TASK_STATUS_MAP["TODO"];
                   return (
@@ -293,32 +276,22 @@ export default function TasksList() {
                         {status.icon}
                         <span className="font-medium truncate">
                           {task.title}
-                          {task?.userStory && (
-                            <span className="ml-2 text-xs text-muted-foreground bg-gray-100 rounded px-2 py-0.5">
-                              {task?.userStory?.title}
-                            </span>
-                          )}
                         </span>
                         <Badge className={status.badgeColor + " ml-2"}>
                           {status.label}
                         </Badge>
-
                         {task.type && (
                           <Badge className="bg-gray-100 text-gray-800 ml-2 flex items-center gap-1">
                             <Timer className="w-3 h-3" />
                             {TASK_TYPE_LABELS[task.type] || task.type}
                           </Badge>
                         )}
-
-                        {getDuration(task) !== null && (
-                          <span className="ml-2 text-sm text-purple-700 font-semibold flex items-center gap-1">
-                            <Clock className="w-4 h-4" />
-                            Duração:{" "}
-                            {getDuration(task) !== null
-                              ? formatMinutes(getDuration(task)!)
-                              : "-"}
-                          </span>
-                        )}
+                        <span className="flex-1 mr-4 text-sm text-purple-700 font-semibold flex items-center justify-end gap-1">
+                          <Clock className="w-4 h-4" />
+                          {task.estimatedTime
+                            ? formatMinutes(task.estimatedTime || 0)
+                            : "-"}
+                        </span>
                       </div>
                       <div className="flex gap-2">
                         <Button
@@ -339,6 +312,19 @@ export default function TasksList() {
                     </div>
                   );
                 })}
+
+                <div className="flex items-center pt-2 text-sm text-purple-800 font-semibold gap-2">
+                  <Clock className="w-4 h-4" />
+                  Tempo US:{" "}
+                  <span>
+                    {formatMinutes(
+                      groupedByUS[usTitle].reduce(
+                        (acc, t) => acc + (t.estimatedTime || 0),
+                        0
+                      )
+                    )}
+                  </span>
+                </div>
               </div>
             </div>
           ))}
@@ -358,6 +344,25 @@ export default function TasksList() {
       )}
 
       {error && <div className="text-red-500 text-sm text-center">{error}</div>}
+
+      {tasks.length > 0 && (
+        <div className="flex ml-1 items-center justify-start mt-4 text-base text-purple-900 font-medium gap-2 border-t pt-4">
+          Tempo total:
+          <span>
+            {formatMinutes(
+              sortedUSTitles.reduce(
+                (acc, usTitle) =>
+                  acc +
+                  groupedByUS[usTitle].reduce(
+                    (sum, t) => sum + (t.estimatedTime || 0),
+                    0
+                  ),
+                0
+              )
+            )}
+          </span>
+        </div>
+      )}
     </>
   );
 }

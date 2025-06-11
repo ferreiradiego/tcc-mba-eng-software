@@ -28,6 +28,11 @@ const nav = [
   { href: "/dashboard/timelogs", label: "Tempo", icon: Timer },
   { href: "/dashboard/ceremonies", label: "Cerimônias", icon: Users },
   { href: "/dashboard/reports", label: "Relatórios", icon: FileText },
+  {
+    href: "/dashboard/trimesters",
+    label: "Trimestres & Sprints",
+    icon: ListChecks,
+  },
 ];
 
 export function Sidebar() {

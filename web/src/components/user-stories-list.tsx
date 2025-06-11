@@ -112,6 +112,15 @@ export default function UserStoriesList() {
                                 </Badge>
                               )}
                             </div>
+
+                            {story.activationDate && (
+                              <span className="text-xs text-muted-foreground">
+                                Ativada em:{" "}
+                                {new Date(
+                                  story.activationDate
+                                ).toLocaleDateString("pt-BR")}
+                              </span>
+                            )}
                             <div className="flex flex-wrap items-center gap-2 mt-1">
                               <Badge
                                 variant={

@@ -68,9 +68,14 @@ export class PrismaUserStoryRepository implements UserStoryRepository {
     id: string,
     data: Partial<UserStory>
   ): Promise<UserStory | null> {
+    const current = await prisma.userStory.findUnique({ where: { id } });
+    let updateData = toPrismaUpdateInput(data);
+    if (data.status === "IN_PROGRESS" && !current?.activationDate) {
+      updateData = { ...updateData, activationDate: new Date() };
+    }
     const updated = await prisma.userStory.update({
       where: { id },
-      data: toPrismaUpdateInput(data),
+      data: updateData,
     });
     return toUserStory(updated);
   }

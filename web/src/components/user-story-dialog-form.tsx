@@ -2,7 +2,6 @@
 
 import {
   ControlledCheckbox,
-  ControlledDatePicker,
   ControlledInput,
   ControlledSelect,
   ControlledTextArea,
@@ -28,7 +27,6 @@ const UserStorySchema = z.object({
   title: z.string().min(2, "Título obrigatório"),
   status: z.string(),
   description: z.string().optional(),
-  activationDate: z.coerce.date().optional(),
   sprintId: z.string().optional(),
   blocked: z.boolean().optional(),
 });
@@ -51,9 +49,6 @@ export function UserStoryDialogForm({
     defaultValues: userStory
       ? {
           ...userStory,
-          activationDate: userStory.activationDate
-            ? new Date(userStory.activationDate)
-            : undefined,
         }
       : {},
   });
@@ -63,9 +58,6 @@ export function UserStoryDialogForm({
       setOpen(true);
       methods.reset({
         ...userStory,
-        activationDate: userStory.activationDate
-          ? new Date(userStory.activationDate)
-          : undefined,
       });
     }
   }, [userStory]);
@@ -80,9 +72,6 @@ export function UserStoryDialogForm({
   async function onSubmit(data: UserStoryForm) {
     const payload = {
       ...data,
-      activationDate: data.activationDate
-        ? data.activationDate.toISOString()
-        : undefined,
     };
     if (isEdit && userStory) {
       await updateUserStory.mutateAsync({ id: userStory.id, data: payload });
@@ -137,10 +126,6 @@ export function UserStoryDialogForm({
                     label: s.name,
                   })),
                 ]}
-              />
-              <ControlledDatePicker
-                name="activationDate"
-                label="Data de Ativação"
               />
               <ControlledCheckbox name="blocked" label="Bloqueada" />
               <Button

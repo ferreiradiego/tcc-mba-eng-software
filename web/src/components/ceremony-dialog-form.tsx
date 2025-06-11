@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { useCeremonies, Ceremony } from "@/hooks/use-ceremonies";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, PlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -173,7 +173,12 @@ export function CeremonyDialogForm({
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        {!isEdit && <Button>Nova Cerimônia</Button>}
+        {!isEdit && (
+          <Button className="bg-green-600 hover:bg-green-700 text-white rounded-full">
+            <PlusIcon />
+            Adicionar
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

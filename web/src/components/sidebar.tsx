@@ -19,6 +19,7 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
+import { Logo } from "./logo";
 
 const nav = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
@@ -38,8 +39,10 @@ export function Sidebar() {
 
   return (
     <aside className="w-64 bg-background border-r h-screen p-4 flex flex-col gap-4">
-      <div className="font-bold text-lg mb-2">Dev Productivity</div>
-      <div className="mb-2">
+      <div className="flex justify-center">
+        <Logo />
+      </div>
+      <div className="mb-2 text-sm">
         {isLoading ? (
           <Skeleton className="h-16 w-full rounded-lg" />
         ) : user ? (
@@ -82,9 +85,6 @@ export function Sidebar() {
                 {user.email}
               </div>
             </div>
-            <Link href="/dashboard/settings">
-              <Settings className="w-5 h-5" />
-            </Link>
           </div>
         ) : null}
       </div>
@@ -95,8 +95,8 @@ export function Sidebar() {
             href={href}
             className="flex items-center gap-2 rounded px-3 py-2 hover:bg-accent focus:bg-accent transition-colors group"
           >
-            <Icon className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
-            <span className="truncate">{label}</span>
+            <Icon className="w-4 h-4 text-muted-foreground group-hover:text-primary" />
+            <span className="truncate text-sm">{label}</span>
           </Link>
         ))}
         <div className="border-t my-4 border-border" />
@@ -105,7 +105,7 @@ export function Sidebar() {
         href="/logout"
         className="flex items-center gap-2 rounded px-3 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors mt-2 group w-full"
       >
-        <LogOut className="w-5 h-5 text-red-400 group-hover:text-red-600" />
+        <LogOut className="w-4 h-4 text-red-400 group-hover:text-red-600" />
         <span>Sair</span>
       </Link>
     </aside>

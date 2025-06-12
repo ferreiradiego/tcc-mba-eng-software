@@ -4,6 +4,14 @@ import express from "express";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import jwt from "jsonwebtoken";
 
+// TODO: Refatorar autenticação para middleware reutilizável e tipado
+interface JwtPayload {
+  sub: string;
+  role?: string;
+  iat?: number;
+  exp?: number;
+}
+
 dotenv.config();
 
 const app = express();
@@ -22,7 +30,7 @@ app.use((req, res, next) => {
     return res.status(401).json({ message: "Token não fornecido" });
   const [, token] = authHeader.split(" ");
   try {
-    jwt.verify(token, process.env.JWT_SECRET || "default_secret");
+    jwt.verify(token, process.env.JWT_SECRET || "default_secret") as JwtPayload;
     next();
   } catch {
     res.status(401).json({ message: "Token inválido" });

@@ -2,14 +2,46 @@
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Download } from "lucide-react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useReportApi } from "@/hooks/use-report-api";
+import { useTrimesters } from "@/hooks/use-trimesters";
+import { Download, ListChecks, Users } from "lucide-react";
+import { useMemo, useState } from "react";
 
 export default function ReportsSummary() {
   const { user, isLoading: userLoading } = useCurrentUser();
-  const { summary, tasks, ceremonies, exportReport } = useReportApi(user?.id);
+  const { summary, exportReport } = useReportApi(user?.id);
+  const { trimesters, loading: loadingTrimesters } = useTrimesters();
+
+  const defaultTrimesterId =
+    trimesters.length > 0 ? trimesters[trimesters.length - 1].id : "";
+  const [selectedTrimester, setSelectedTrimester] =
+    useState<string>(defaultTrimesterId);
+
+  const selectedTrimesterObj = useMemo(() => {
+    return (
+      trimesters.find((t) => t.id === selectedTrimester) ||
+      trimesters[trimesters.length - 1]
+    );
+  }, [selectedTrimester, trimesters]);
+
+  function handleExport(type: "summary" | "tasks" | "ceremonies") {
+    if (!user?.id || !selectedTrimesterObj) return;
+    exportReport(
+      type,
+      "pdf",
+      selectedTrimesterObj.year,
+      selectedTrimesterObj.number
+    );
+  }
 
   if (userLoading || summary.isLoading) {
     return (
@@ -31,92 +63,46 @@ export default function ReportsSummary() {
   }
 
   return (
-    <>
-      <Card className="p-4 space-y-2 mb-4">
-        <div className="font-bold text-lg mb-2">Resumo Geral</div>
-        <div className="flex flex-col gap-1">
-          <div>
-            Tarefas:{" "}
-            <span className="font-semibold">{summary.data?.data.totalTasks ?? 0}</span>
-            <Button
-              asChild
-              variant="ghost"
-              size="sm"
-              className="ml-2 px-2 py-0 h-6"
-              title="Exportar tarefas PDF"
-            >
-              <a onClick={() => exportReport("tasks")}>
-                <Download className="w-4 h-4" />
-              </a>
-            </Button>
-          </div>
-          <div>
-            Cerimônias:{" "}
-            <span className="font-semibold">
-              {summary.data?.data.totalCeremonies ?? 0}
-            </span>
-            <Button
-              asChild
-              variant="ghost"
-              size="sm"
-              className="ml-2 px-2 py-0 h-6"
-              title="Exportar cerimônias PDF"
-            >
-              <a onClick={() => exportReport("ceremonies")}>
-                <Download className="w-4 h-4" />
-              </a>
-            </Button>
-          </div>
-        </div>
-        <div className="pt-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => exportReport("summary")}
-          >
-            <Download className="w-4 h-4 mr-2" /> Exportar Resumo PDF
-          </Button>
-        </div>
-      </Card>
-      <Card className="p-4 space-y-2 mb-4">
-        <div className="font-bold mb-2">Relatório de Tarefas</div>
-        {tasks.isLoading ? (
-          <Skeleton className="h-5 w-1/2 rounded" />
-        ) : (
-          <ul className="list-disc pl-5 space-y-1">
-            {tasks.data?.data?.length > 0 ? (
-              tasks.data.data.map((t: any) => (
-                <li key={t.id} className="text-sm">
-                  {t.title || t.name || t.id}
-                </li>
-              ))
-            ) : (
-              <li className="text-muted-foreground">Nenhuma tarefa encontrada.</li>
-            )}
-          </ul>
-        )}
-      </Card>
-      <Card className="p-4 space-y-2">
-        <div className="font-bold mb-2">Relatório de Cerimônias</div>
-        {ceremonies.isLoading ? (
-          <Skeleton className="h-5 w-1/2 rounded" />
-        ) : (
-          <ul className="list-disc pl-5 space-y-1">
-            {ceremonies.data?.data?.length > 0 ? (
-              ceremonies.data.data.map((c: any) => (
-                <li key={c.id} className="text-sm">
-                  {c.type} -{" "}
-                  {c.scheduledAt
-                    ? new Date(c.scheduledAt).toLocaleDateString()
-                    : c.id}
-                </li>
-              ))
-            ) : (
-              <li className="text-muted-foreground">Nenhuma cerimônia encontrada.</li>
-            )}
-          </ul>
-        )}
-      </Card>
-    </>
+    <div className="flex flex-row">
+      <Select
+        value={selectedTrimester || defaultTrimesterId}
+        onValueChange={setSelectedTrimester}
+        disabled={loadingTrimesters || trimesters.length === 0}
+      >
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Selecione o trimestre" />
+        </SelectTrigger>
+        <SelectContent>
+          {trimesters.map((t) => (
+            <SelectItem key={t.id} value={t.id}>
+              {t.year} - {t.number}º trimestre
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <div className="flex flex-row gap-4 flex-1 justify-end">
+        <Button
+          variant="outline"
+          onClick={() => handleExport("summary")}
+          title="Exportar Resumo PDF"
+        >
+          <Download className="w-4 h-4 mr-2 text-blue-700" /> Resumo
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => handleExport("tasks")}
+          title="Exportar Tarefas PDF"
+        >
+          <ListChecks className="w-4 h-4 mr-2 text-green-700" /> Tarefas
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => handleExport("ceremonies")}
+          title="Exportar Cerimônias PDF"
+        >
+          <Users className="w-4 h-4 mr-2 text-orange-700" /> Cerimônias
+        </Button>
+      </div>
+    </div>
   );
 }

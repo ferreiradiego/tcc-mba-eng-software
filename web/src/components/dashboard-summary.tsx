@@ -1,30 +1,50 @@
 "use client";
-import { useCurrentUser } from "@/hooks/use-current-user";
-import { useReportApi } from "@/hooks/use-report-api";
-import { Skeleton } from "@/components/ui/skeleton";
+
+import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
 import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip as RechartsTooltip,
-  BarChart,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useCurrentUser } from "@/hooks/use-current-user";
+import { useReportApi } from "@/hooks/use-report-api";
+import { useTrimesters } from "@/hooks/use-trimesters";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { useMemo, useState } from "react";
+import {
   Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
   XAxis,
   YAxis,
-  ResponsiveContainer,
-  Legend,
-  LineChart,
-  Line,
-  CartesianGrid,
 } from "recharts";
-import React, { useMemo, useState } from "react";
-import { Calendar as CalendarIcon } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
 
-const COLORS = ["#3b82f6", "#f59e42", "#10b981", "#ef4444", "#a21caf", "#fbbf24"];
+const COLORS = [
+  "#3b82f6",
+  "#f59e42",
+  "#10b981",
+  "#ef4444",
+  "#a21caf",
+  "#fbbf24",
+];
 
 function formatDate(date: Date) {
   return date.toISOString().split("T")[0];
@@ -32,13 +52,34 @@ function formatDate(date: Date) {
 
 export default function DashboardSummary() {
   const { user, isLoading: userLoading } = useCurrentUser();
-  const [dateFromObj, setDateFromObj] = useState<Date>(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000));
+  const { trimesters, loading: loadingTrimesters } = useTrimesters();
+
+  const defaultTrimesterId =
+    trimesters.length > 0 ? trimesters[trimesters.length - 1].id : "";
+
+  const [dateFromObj, setDateFromObj] = useState<Date>(
+    new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+  );
   const [dateToObj, setDateToObj] = useState<Date>(new Date());
+  const [selectedTrimester, setSelectedTrimester] =
+    useState<string>(defaultTrimesterId);
+
   const dateFrom = formatDate(dateFromObj);
   const dateTo = formatDate(dateToObj);
-  const { summary } = useReportApi(user?.id); // Filtro de data pode ser adicionado na API futuramente
 
-  // Filtro local (mock): filtra tarefas/cerimônias por data
+  const selectedTrimesterObj = useMemo(() => {
+    return (
+      trimesters.find((t) => t.id === selectedTrimester) ||
+      trimesters[trimesters.length - 1]
+    );
+  }, [selectedTrimester, trimesters]);
+
+  const { summary } = useReportApi(
+    user?.id,
+    selectedTrimesterObj?.year,
+    selectedTrimesterObj?.number
+  );
+
   const filteredTasks = useMemo(() => {
     if (!summary.data?.data.tasks) return [];
     return summary.data.data.tasks.filter((t: any) => {
@@ -57,7 +98,6 @@ export default function DashboardSummary() {
     });
   }, [summary.data, dateFrom, dateTo]);
 
-  // Gráfico de tarefas por dia
   const tasksByDay = useMemo(() => {
     const map: Record<string, number> = {};
     filteredTasks.forEach((t: any) => {
@@ -67,7 +107,6 @@ export default function DashboardSummary() {
     return Object.entries(map).map(([date, value]) => ({ date, value }));
   }, [filteredTasks]);
 
-  // Gráfico de status de tarefas
   const statusMap = useMemo(() => {
     const map: Record<string, number> = {};
     filteredTasks.forEach((t: any) => {
@@ -77,7 +116,6 @@ export default function DashboardSummary() {
     return Object.entries(map).map(([name, value]) => ({ name, value }));
   }, [filteredTasks]);
 
-  // Dados para gráficos principais
   const totalTasks = filteredTasks.length;
   const totalCeremonies = filteredCeremonies.length;
   const chartData = [
@@ -85,20 +123,24 @@ export default function DashboardSummary() {
     { name: "Cerimônias", value: totalCeremonies },
   ];
 
-  // Tabela de tarefas (exemplo)
   const taskRows = filteredTasks.slice(0, 5).map((t: any) => (
     <tr key={t.id} className="border-b">
       <td className="px-2 py-1 text-sm">{t.title || t.name || t.id}</td>
-      <td className="px-2 py-1 text-xs text-muted-foreground">{t.status || "-"}</td>
-      <td className="px-2 py-1 text-xs text-muted-foreground">{t.createdAt ? new Date(t.createdAt).toLocaleDateString() : "-"}</td>
+      <td className="px-2 py-1 text-xs text-muted-foreground">
+        {t.status || "-"}
+      </td>
+      <td className="px-2 py-1 text-xs text-muted-foreground">
+        {t.createdAt ? new Date(t.createdAt).toLocaleDateString() : "-"}
+      </td>
     </tr>
   ));
 
-  // Tabela de cerimônias (exemplo)
   const ceremonyRows = filteredCeremonies.slice(0, 5).map((c: any) => (
     <tr key={c.id} className="border-b">
       <td className="px-2 py-1 text-sm">{c.type}</td>
-      <td className="px-2 py-1 text-xs text-muted-foreground">{c.scheduledAt ? new Date(c.scheduledAt).toLocaleDateString() : "-"}</td>
+      <td className="px-2 py-1 text-xs text-muted-foreground">
+        {c.scheduledAt ? new Date(c.scheduledAt).toLocaleDateString() : "-"}
+      </td>
     </tr>
   ));
 
@@ -113,8 +155,24 @@ export default function DashboardSummary() {
   }
 
   return (
-    <>
-      <div className="flex flex-wrap gap-4 items-center mb-4">
+    <div className="space-y-6">
+      <div className="flex flex-wrap gap-4 items-center">
+        <Select
+          value={selectedTrimester || defaultTrimesterId}
+          onValueChange={setSelectedTrimester}
+          disabled={loadingTrimesters || trimesters.length === 0}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Selecione o trimestre" />
+          </SelectTrigger>
+          <SelectContent>
+            {trimesters.map((t) => (
+              <SelectItem key={t.id} value={t.id}>
+                {t.year} - {t.number}º trimestre
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <Popover>
           <PopoverTrigger asChild>
             <button className="flex items-center gap-2 border rounded px-2 py-1 text-sm bg-background hover:bg-accent transition">
@@ -126,8 +184,7 @@ export default function DashboardSummary() {
             <Calendar
               mode="single"
               selected={dateFromObj}
-              onSelect={d => d && setDateFromObj(d)}
-              disabled={d => d > dateToObj}
+              onSelect={(d) => d && setDateFromObj(d)}
             />
           </PopoverContent>
         </Popover>
@@ -142,25 +199,36 @@ export default function DashboardSummary() {
             <Calendar
               mode="single"
               selected={dateToObj}
-              onSelect={d => d && setDateToObj(d)}
-              disabled={d => d < dateFromObj || d > new Date()}
+              onSelect={(d) => d && setDateToObj(d)}
             />
           </PopoverContent>
         </Popover>
-        <span className="text-xs text-muted-foreground">({filteredTasks.length} tarefas, {filteredCeremonies.length} cerimônias)</span>
+        <span className="text-xs text-muted-foreground">
+          ({filteredTasks.length} tarefas, {filteredCeremonies.length}{" "}
+          cerimônias)
+        </span>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card className="rounded-lg p-6 shadow flex flex-col items-center justify-center bg-blue-50 dark:bg-blue-950">
-          <div className="flex items-center gap-2 text-blue-700 dark:text-blue-300"><span className="font-bold text-2xl">{totalTasks}</span> <span className="text-sm">Tarefas</span></div>
+          <div className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
+            <span className="font-bold text-2xl">{totalTasks}</span>{" "}
+            <span className="text-sm">Tarefas</span>
+          </div>
         </Card>
         <Card className="rounded-lg p-6 shadow flex flex-col items-center justify-center bg-orange-50 dark:bg-orange-950">
-          <div className="flex items-center gap-2 text-orange-700 dark:text-orange-300"><span className="font-bold text-2xl">{totalCeremonies}</span> <span className="text-sm">Cerimônias</span></div>
+          <div className="flex items-center gap-2 text-orange-700 dark:text-orange-300">
+            <span className="font-bold text-2xl">{totalCeremonies}</span>{" "}
+            <span className="text-sm">Cerimônias</span>
+          </div>
         </Card>
         <Card className="rounded-lg p-6 shadow flex flex-col items-center justify-center bg-green-50 dark:bg-green-950">
-          <div className="flex items-center gap-2 text-green-700 dark:text-green-300"><span className="font-bold text-2xl">{statusMap.length}</span> <span className="text-sm">Status de Tarefas</span></div>
+          <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+            <span className="font-bold text-2xl">{statusMap.length}</span>{" "}
+            <span className="text-sm">Status de Tarefas</span>
+          </div>
         </Card>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="p-4 flex flex-col items-center">
           <div className="font-semibold mb-2">Distribuição Geral</div>
           <ResponsiveContainer width="100%" height={220}>
@@ -169,7 +237,10 @@ export default function DashboardSummary() {
               <YAxis allowDecimals={false} />
               <Bar dataKey="value">
                 {chartData.map((entry, idx) => (
-                  <Cell key={`bar-cell-${idx}`} fill={COLORS[idx % COLORS.length]} />
+                  <Cell
+                    key={`bar-cell-${idx}`}
+                    fill={COLORS[idx % COLORS.length]}
+                  />
                 ))}
               </Bar>
               <RechartsTooltip />
@@ -190,7 +261,10 @@ export default function DashboardSummary() {
                 label
               >
                 {statusMap.map((entry, idx) => (
-                  <Cell key={`cell-status-${idx}`} fill={COLORS[idx % COLORS.length]} />
+                  <Cell
+                    key={`cell-status-${idx}`}
+                    fill={COLORS[idx % COLORS.length]}
+                  />
                 ))}
               </Pie>
               <RechartsTooltip />
@@ -199,15 +273,23 @@ export default function DashboardSummary() {
           </ResponsiveContainer>
         </Card>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="p-4 flex flex-col items-center">
           <div className="font-semibold mb-2">Tarefas Criadas por Dia</div>
           <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={tasksByDay} margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+            <LineChart
+              data={tasksByDay}
+              margin={{ left: 8, right: 8, top: 8, bottom: 8 }}
+            >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" />
               <YAxis allowDecimals={false} />
-              <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} />
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke="#3b82f6"
+                strokeWidth={2}
+              />
               <RechartsTooltip />
             </LineChart>
           </ResponsiveContainer>
@@ -226,7 +308,10 @@ export default function DashboardSummary() {
                 label
               >
                 {chartData.map((entry, idx) => (
-                  <Cell key={`cell-main-${idx}`} fill={COLORS[idx % COLORS.length]} />
+                  <Cell
+                    key={`cell-main-${idx}`}
+                    fill={COLORS[idx % COLORS.length]}
+                  />
                 ))}
               </Pie>
               <RechartsTooltip />
@@ -235,7 +320,7 @@ export default function DashboardSummary() {
           </ResponsiveContainer>
         </Card>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="p-4 overflow-x-auto">
           <div className="font-semibold mb-2">Tarefas Recentes</div>
           <table className="w-full text-left">
@@ -246,7 +331,17 @@ export default function DashboardSummary() {
                 <th className="px-2 py-1">Criada em</th>
               </tr>
             </thead>
-            <tbody>{taskRows.length > 0 ? taskRows : <tr><td colSpan={3} className="text-muted-foreground text-center">Nenhuma tarefa</td></tr>}</tbody>
+            <tbody>
+              {taskRows.length > 0 ? (
+                taskRows
+              ) : (
+                <tr>
+                  <td colSpan={3} className="text-muted-foreground text-center">
+                    Nenhuma tarefa
+                  </td>
+                </tr>
+              )}
+            </tbody>
           </table>
         </Card>
         <Card className="p-4 overflow-x-auto">
@@ -258,10 +353,20 @@ export default function DashboardSummary() {
                 <th className="px-2 py-1">Data</th>
               </tr>
             </thead>
-            <tbody>{ceremonyRows.length > 0 ? ceremonyRows : <tr><td colSpan={2} className="text-muted-foreground text-center">Nenhuma cerimônia</td></tr>}</tbody>
+            <tbody>
+              {ceremonyRows.length > 0 ? (
+                ceremonyRows
+              ) : (
+                <tr>
+                  <td colSpan={2} className="text-muted-foreground text-center">
+                    Nenhuma cerimônia
+                  </td>
+                </tr>
+              )}
+            </tbody>
           </table>
         </Card>
       </div>
-    </>
+    </div>
   );
 }

@@ -422,11 +422,62 @@
               "response": []
             },
             {
-              "name": "Exportar PDF",
+              "name": "Exportar PDF - Tarefas",
               "request": {
                 "method": "GET",
                 "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
-                "url": { "raw": "http://localhost:4000/reports/export/pdf?userId={{userId}}", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["reports", "export", "pdf"], "query": [ { "key": "userId", "value": "{{userId}}" } ] }
+                "url": {
+                  "raw": "http://localhost:4000/reports/export?userId={{userId}}&type=tasks&format=pdf",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "4000",
+                  "path": ["reports", "export"],
+                  "query": [
+                    { "key": "userId", "value": "{{userId}}" },
+                    { "key": "type", "value": "tasks" },
+                    { "key": "format", "value": "pdf" }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Exportar PDF - Cerimônias",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": {
+                  "raw": "http://localhost:4000/reports/export?userId={{userId}}&type=ceremonies&format=pdf",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "4000",
+                  "path": ["reports", "export"],
+                  "query": [
+                    { "key": "userId", "value": "{{userId}}" },
+                    { "key": "type", "value": "ceremonies" },
+                    { "key": "format", "value": "pdf" }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Exportar PDF - Resumo do Trimestre",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": {
+                  "raw": "http://localhost:4000/reports/export?userId={{userId}}&type=summary&format=pdf",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "4000",
+                  "path": ["reports", "export"],
+                  "query": [
+                    { "key": "userId", "value": "{{userId}}" },
+                    { "key": "type", "value": "summary" },
+                    { "key": "format", "value": "pdf" }
+                  ]
+                }
               },
               "response": []
             }

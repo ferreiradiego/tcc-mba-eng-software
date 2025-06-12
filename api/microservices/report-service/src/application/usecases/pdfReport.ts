@@ -1,24 +1,44 @@
-import PDFDocument from 'pdfkit';
-import { ReportTaskRepository } from '@infrastructure/repositories/ReportTaskRepository';
-import { ReportCeremonyRepository } from '@infrastructure/repositories/ReportCeremonyRepository';
-import { ReportTimeLogRepository } from '@infrastructure/repositories/ReportTimeLogRepository';
-import { ReportUserRepository } from '@infrastructure/repositories/ReportUserRepository';
+import PDFDocument from "pdfkit";
+import { ReportTaskRepository } from "@infrastructure/repositories/ReportTaskRepository";
+import { ReportCeremonyRepository } from "@infrastructure/repositories/ReportCeremonyRepository";
+import { ReportUserRepository } from "@infrastructure/repositories/ReportUserRepository";
+import { ReportTrimesterRepository } from "@infrastructure/repositories/ReportTrimesterRepository";
 
 const taskRepo = new ReportTaskRepository();
 const ceremonyRepo = new ReportCeremonyRepository();
-const timeLogRepo = new ReportTimeLogRepository();
 const userRepo = new ReportUserRepository();
+const trimesterRepo = new ReportTrimesterRepository();
 
-export async function generatePDFReport(userId: string, token: string): Promise<Buffer> {
-  // Busca dados reais dos microserviços
-  const [user, tasks, ceremonies, timeLogs] = await Promise.all([
+export async function generatePDFReport(
+  userId: string,
+  token: string,
+  type: string = "summary",
+  trimesterParams?: { year?: number; number?: number }
+): Promise<Buffer> {
+  const [user, tasks, ceremonies, trimesters] = await Promise.all([
     userRepo.getUserById(userId, token),
     taskRepo.findAllByUser(userId, token),
     ceremonyRepo.findAllByUser(userId, token),
-    timeLogRepo.findAllByUser(userId, token)
+    trimesterRepo.findAll(token),
   ]);
 
-  // Cria um mapa de tasks para facilitar a exibição dos nomes nas seções de timeLogs
+  let trimester = null;
+  if (Array.isArray(trimesters) && trimesters.length > 0) {
+    if (trimesterParams?.year && trimesterParams?.number) {
+      trimester = trimesters.find(
+        (t: any) =>
+          t.year === trimesterParams.year && t.number === trimesterParams.number
+      );
+    }
+    if (!trimester) {
+      trimester = trimesters.reduce((a, b) => {
+        if (a.year > b.year) return a;
+        if (a.year < b.year) return b;
+        return a.number > b.number ? a : b;
+      });
+    }
+  }
+
   const taskMap = new Map();
   if (Array.isArray(tasks)) {
     tasks.forEach((task: any) => {
@@ -26,58 +46,108 @@ export async function generatePDFReport(userId: string, token: string): Promise<
     });
   }
 
+  let filteredTasks = tasks;
+  let filteredCeremonies = ceremonies;
+  if (trimester) {
+    const sprints = Array.isArray(trimester.sprints) ? trimester.sprints : [];
+    const sprintIds = sprints.map((s: any) => s.id);
+    filteredTasks = (tasks || []).filter((task: any) => {
+      return task.userStory && sprintIds.includes(task.userStory.sprintId);
+    });
+    filteredCeremonies = (ceremonies || []).filter((c: any) =>
+      sprintIds.includes(c.sprintId)
+    );
+  }
+
   return new Promise((resolve) => {
     const doc = new PDFDocument();
     const buffers: Buffer[] = [];
-    doc.on('data', buffers.push.bind(buffers));
-    doc.on('end', () => {
+    doc.on("data", buffers.push.bind(buffers));
+    doc.on("end", () => {
       const pdfData = Buffer.concat(buffers);
       resolve(pdfData);
     });
     // Cabeçalho
-    doc.fontSize(20).text('Relatório de Produtividade', { align: 'center' });
+    doc.fontSize(20).text("Relatório de Produtividade", { align: "center" });
     doc.moveDown();
-    doc.fontSize(14).text(`Usuário: ${user && user.name ? user.name : userId}`);
+    doc.fontSize(14).text(`${user && user.name ? user.name : userId}`);
     if (user && user.email) doc.fontSize(10).text(`E-mail: ${user.email}`);
     doc.moveDown();
-    // Tarefas
-    doc.fontSize(16).text('Tarefas', { underline: true });
-    if (tasks && tasks.length) {
-      tasks.forEach((task: any) => {
-        doc.fontSize(12).text(`• ${task.title} (${task.category || 'Sem categoria'})`);
-        doc.fontSize(10).text(`   Status: ${task.status} | Prioridade: ${task.priority}`);
-        if (task.description) doc.fontSize(10).text(`   Descrição: ${task.description}`);
-        if (task.dueDate) doc.fontSize(10).text(`   Prazo: ${new Date(task.dueDate).toLocaleString()}`);
-        doc.moveDown(0.2);
-      });
-    } else {
-      doc.fontSize(12).text('Nenhuma tarefa encontrada.');
-    }
-    doc.moveDown();
-    // Cerimônias
-    doc.fontSize(16).text('Cerimônias', { underline: true });
-    if (ceremonies && ceremonies.length) {
-      ceremonies.forEach((ceremony: any) => {
-        doc.fontSize(12).text(`• ${ceremony.type} | Início: ${new Date(ceremony.startTime).toLocaleString()} | Fim: ${new Date(ceremony.endTime).toLocaleString()}`);
-        if (ceremony.participants && ceremony.participants.length) {
-          doc.fontSize(10).text(`   Participantes: ${ceremony.participants.join(', ')}`);
+    // Resumo do Trimestre
+    if (trimester) {
+      doc
+        .fontSize(14)
+        .text(`Trimestre: ${trimester.year} - ${trimester.number}º trimestre`, {
+          underline: true,
+        });
+      // Contagem de sprints, tarefas e cerimônias do trimestre
+      const sprints = Array.isArray(trimester.sprints) ? trimester.sprints : [];
+      // Contar tasks e ceremonies de todos os sprints
+      let totalTasks = 0;
+      let totalCeremonies = 0;
+      sprints.forEach((s: any) => {
+        if (Array.isArray(s.userStories)) {
+          s.userStories.forEach((us: any) => {
+            if (Array.isArray(us.tasks)) {
+              totalTasks += us.tasks.length;
+            }
+          });
         }
-        doc.moveDown(0.2);
+        if (Array.isArray(s.ceremonies)) {
+          totalCeremonies += s.ceremonies.length;
+        }
       });
-    } else {
-      doc.fontSize(12).text('Nenhuma cerimônia encontrada.');
+      doc.fontSize(12).text(`Sprints: ${sprints.length}`);
+      doc.fontSize(12).text(`Tarefas: ${totalTasks}`);
+      doc.fontSize(12).text(`Cerimônias: ${totalCeremonies}`);
+      doc.moveDown();
     }
-    doc.moveDown();
-    // Registros de Tempo
-    doc.fontSize(16).text('Registros de Tempo', { underline: true });
-    if (timeLogs && timeLogs.length) {
-      timeLogs.forEach((log: any) => {
-        const task = taskMap.get(log.taskId);
-        doc.fontSize(12).text(`• Tarefa: ${task ? task.title : log.taskId}`);
-        doc.fontSize(10).text(`   Início: ${new Date(log.startTime).toLocaleString()} | Fim: ${log.endTime ? new Date(log.endTime).toLocaleString() : 'Em andamento'} | Status: ${log.status}`);
-      });
-    } else {
-      doc.fontSize(12).text('Nenhum registro de tempo encontrado.');
+
+    if (type === "tasks" || type === "summary") {
+      // Tarefas
+      doc.fontSize(16).text("Tarefas", { underline: true });
+      if (filteredTasks && filteredTasks.length) {
+        filteredTasks.forEach((task: any) => {
+          doc
+            .fontSize(12)
+            .text(`• ${task.title} (${task.category || "Sem categoria"})`);
+          doc.fontSize(10).text(`   Status: ${task.status}`);
+          if (task.description)
+            doc.fontSize(10).text(`   Descrição: ${task.description}`);
+          if (task.dueDate)
+            doc
+              .fontSize(10)
+              .text(`   Prazo: ${new Date(task.dueDate).toLocaleString()}`);
+          doc.moveDown(0.2);
+        });
+      } else {
+        doc.fontSize(12).text("Nenhuma tarefa encontrada.");
+      }
+      doc.moveDown();
+    }
+
+    if (type === "ceremonies" || type === "summary") {
+      // Cerimônias
+      doc.fontSize(16).text("Cerimônias", { underline: true });
+      let ceremoniesToShow = filteredCeremonies;
+      if (ceremoniesToShow && ceremoniesToShow.length) {
+        ceremoniesToShow.forEach((ceremony: any) => {
+          doc
+            .fontSize(12)
+            .text(
+              `• ${ceremony.type} | Início: ${new Date(
+                ceremony.startTime
+              ).toLocaleString()} | Fim: ${new Date(
+                ceremony.endTime
+              ).toLocaleString()}`
+            );
+
+          doc.moveDown(0.2);
+        });
+      } else {
+        doc.fontSize(12).text("Nenhuma cerimônia encontrada.");
+      }
+      doc.moveDown();
     }
     doc.end();
   });

@@ -1,7 +1,7 @@
 import { Ceremony } from "@domain/entities/Ceremony";
 
 export interface CeremonyRepository {
-  findAll(): Promise<Ceremony[]>;
+  findAll(userId?: string): Promise<Ceremony[]>;
   findById(id: string): Promise<Ceremony | null>;
   create(
     ceremony: Omit<Ceremony, "id" | "createdAt" | "updatedAt">

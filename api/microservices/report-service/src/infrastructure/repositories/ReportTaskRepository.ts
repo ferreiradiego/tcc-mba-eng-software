@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const TASK_SERVICE_URL =
-  process.env.TASK_SERVICE_URL || "http://localhost:3002";
+  process.env.SCRUM_SERVICE_URL || "http://localhost:4002";
 
 export class ReportTaskRepository {
   async findAllByUser(userId: string, token: string) {

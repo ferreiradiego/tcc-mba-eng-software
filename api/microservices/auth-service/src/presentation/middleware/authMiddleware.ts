@@ -12,9 +12,10 @@ export function authMiddleware(
   const [, token] = authHeader.split(" ");
   try {
     const payload = verifyToken(token);
+    // TODO: Tipar req.user corretamente usando declaração de tipo global
     (req as any).user = {
-      id: (payload as any).sub,
-      role: (payload as any).role,
+      id: payload.sub,
+      role: payload.role,
     };
     next();
   } catch {

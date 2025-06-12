@@ -3,7 +3,9 @@ import { generateRefreshToken, generateToken } from "@infrastructure/auth/jwt";
 import { PrismaUserRepository } from "@infrastructure/repositories/PrismaUserRepository";
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
 
+// TODO: Refatorar para usar injeção de dependência no repositório
 const userRepository = new PrismaUserRepository();
 
 export async function registerController(req: Request, res: Response) {
@@ -42,13 +44,13 @@ export async function loginController(req: Request, res: Response) {
 }
 
 export async function refreshController(req: Request, res: Response) {
-  // Implementação simplificada: espera refreshToken no body
+  // TODO: Melhorar validação e segurança do refresh token
   const { refreshToken } = req.body;
   try {
-    const payload = require("jsonwebtoken").verify(
+    const payload = jwt.verify(
       refreshToken,
       process.env.JWT_SECRET || "default_secret"
-    );
+    ) as { sub: string };
     const user = await userRepository.findById(payload.sub);
     if (!user)
       return res.status(401).json({ message: "Usuário não encontrado" });
@@ -60,7 +62,6 @@ export async function refreshController(req: Request, res: Response) {
 }
 
 export async function meController(req: Request, res: Response) {
-  // Espera req.user.id preenchido por middleware de autenticação
   const userId = (req as any).user?.id;
   if (!userId) return res.status(401).json({ message: "Não autenticado" });
   const user = await userRepository.findById(userId);

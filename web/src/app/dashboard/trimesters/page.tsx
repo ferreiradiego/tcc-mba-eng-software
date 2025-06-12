@@ -230,7 +230,7 @@ export default function TrimestersSprintsPage() {
                 <div className="font-semibold">
                   {t.year} - {t.number}º trimestre
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 pr-2">
                   <Dialog
                     open={openSprint === t.id}
                     onOpenChange={(v) => handleOpenSprint(v ? t.id : null)}

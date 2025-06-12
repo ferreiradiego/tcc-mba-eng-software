@@ -4,9 +4,30 @@ import type { TaskStatus, TaskType } from "@prisma/client";
 import { TaskRepository } from "./TaskRepository";
 
 export class PrismaTaskRepository implements TaskRepository {
-  async findAll(userId: string): Promise<Task[]> {
+  async findAll(
+    userId: string,
+    year?: number,
+    number?: number
+  ): Promise<Task[]> {
+    let where: any = { userId };
+    if (year && number) {
+      const sprints = await prisma.sprint.findMany({
+        where: {
+          trimester: { year, number },
+        },
+        select: { id: true },
+      });
+      const sprintIds = sprints.map((s) => s.id);
+
+      const userStories = await prisma.userStory.findMany({
+        where: { sprintId: { in: sprintIds } },
+        select: { id: true },
+      });
+      const userStoryIds = userStories.map((us) => us.id);
+      where.userStoryId = { in: userStoryIds };
+    }
     const tasks = await prisma.task.findMany({
-      where: { userId },
+      where,
       include: { userStory: true },
     });
     return tasks.map(mapPrismaTaskToDomain);

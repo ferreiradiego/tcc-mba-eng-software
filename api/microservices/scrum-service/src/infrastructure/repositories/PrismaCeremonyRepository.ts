@@ -4,8 +4,25 @@ import { CeremonyRepository } from "./CeremonyRepository";
 import { $Enums } from "@prisma/client";
 
 export class PrismaCeremonyRepository implements CeremonyRepository {
-  async findAll(userId?: string): Promise<Ceremony[]> {
-    const where = userId ? { participants: { has: userId } } : undefined;
+  async findAll(
+    userId?: string,
+    year?: number,
+    number?: number
+  ): Promise<Ceremony[]> {
+    let where: any = {};
+    if (userId) {
+      where.participants = { has: userId };
+    }
+    if (year && number) {
+      const sprints = await prisma.sprint.findMany({
+        where: {
+          trimester: { year, number },
+        },
+        select: { id: true },
+      });
+      const sprintIds = sprints.map((s) => s.id);
+      where.sprintId = { in: sprintIds };
+    }
     const ceremonies = await prisma.ceremony.findMany({
       where,
       include: { sprint: true },

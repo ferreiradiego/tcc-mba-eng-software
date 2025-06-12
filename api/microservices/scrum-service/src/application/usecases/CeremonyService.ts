@@ -7,8 +7,12 @@ export class CeremonyService {
     this.ceremonyRepo = new PrismaCeremonyRepository();
   }
 
-  async listCeremonies(userId?: string): Promise<Ceremony[]> {
-    return this.ceremonyRepo.findAll(userId);
+  async listCeremonies(
+    userId?: string,
+    year?: number,
+    number?: number
+  ): Promise<Ceremony[]> {
+    return this.ceremonyRepo.findAll(userId, year, number);
   }
 
   async getCeremony(id: string): Promise<Ceremony | null> {

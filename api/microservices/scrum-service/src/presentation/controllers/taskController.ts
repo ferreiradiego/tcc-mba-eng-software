@@ -5,7 +5,9 @@ const taskService = new TaskService();
 
 export async function listTasks(req: Request, res: Response) {
   const userId = req.query.userId as string;
-  const tasks = await taskService.listTasks(userId);
+  const year = req.query.year ? Number(req.query.year) : undefined;
+  const number = req.query.number ? Number(req.query.number) : undefined;
+  const tasks = await taskService.listTasks(userId, year, number);
   res.json(tasks);
 }
 

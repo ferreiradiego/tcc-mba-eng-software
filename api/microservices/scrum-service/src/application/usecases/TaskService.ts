@@ -7,8 +7,12 @@ export class TaskService {
     this.taskRepo = new PrismaTaskRepository();
   }
 
-  async listTasks(userId: string): Promise<Task[]> {
-    return this.taskRepo.findAll(userId);
+  async listTasks(
+    userId: string,
+    year?: number,
+    number?: number
+  ): Promise<Task[]> {
+    return this.taskRepo.findAll(userId, year, number);
   }
 
   async getTask(id: string): Promise<Task | null> {

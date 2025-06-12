@@ -6,7 +6,9 @@ const ceremonyService = new CeremonyService();
 
 export async function listCeremonies(req: Request, res: Response) {
   const userId = req.query.userId as string | undefined;
-  const ceremonies = await ceremonyService.listCeremonies(userId);
+  const year = req.query.year ? Number(req.query.year) : undefined;
+  const number = req.query.number ? Number(req.query.number) : undefined;
+  const ceremonies = await ceremonyService.listCeremonies(userId, year, number);
   res.json(ceremonies);
 }
 

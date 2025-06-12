@@ -93,6 +93,10 @@ export default function TasksList() {
     const to = filters.dateTo ? new Date(filters.dateTo) : null;
     return { from, to };
   });
+  const [usFilter, setUSFilter] = useState<string>("ALL");
+  const usOptions = Array.from(
+    new Set(tasks.map((t) => t.userStory?.title || "Sem US"))
+  );
 
   useEffect(() => {
     const { from, to } = dateRange;
@@ -108,6 +112,8 @@ export default function TasksList() {
   const filteredTasks = tasks.filter((task) => {
     const statusMatch = statusFilter === "ALL" || task.status === statusFilter;
     const typeMatch = typeFilter === "ALL" || task.type === typeFilter;
+    const usMatch =
+      usFilter === "ALL" || (task.userStory?.title || "Sem US") === usFilter;
     const startedDate = task.startedAt ? new Date(task.startedAt) : null;
     let dateMatch = true;
     if (dateRange.from && dateRange.to && startedDate) {
@@ -121,7 +127,7 @@ export default function TasksList() {
         isSameDay(startedDate, dateRange.from) ||
         isAfter(startedDate, dateRange.from);
     }
-    return statusMatch && typeMatch && dateMatch;
+    return statusMatch && typeMatch && usMatch && dateMatch;
   });
 
   const groupedByUS = filteredTasks.reduce(
@@ -169,6 +175,21 @@ export default function TasksList() {
               <SelectItem value="IMPROVEMENT">Melhoria</SelectItem>
               <SelectItem value="FEATURE">Funcionalidade</SelectItem>
               <SelectItem value="CODE_REVIEW">Revisão de Código</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Select value={usFilter} onValueChange={setUSFilter}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="User Story" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">Todas as US</SelectItem>
+              {usOptions.map((us) => (
+                <SelectItem key={us} value={us}>
+                  {us}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -228,6 +249,7 @@ export default function TasksList() {
           onClick={() => {
             setStatusFilter("ALL");
             setTypeFilter("ALL");
+            setUSFilter("ALL");
             setDateRange({ from: null, to: null });
             clearFilters();
           }}
@@ -276,6 +298,13 @@ export default function TasksList() {
                         {status.icon}
                         <span className="font-medium truncate">
                           {task.title}
+                        </span>
+                        <span className="text-xs text-gray-500 ml-2">
+                          {task.dueDate
+                            ? format(new Date(task.dueDate), "P", {
+                                locale: ptBR,
+                              })
+                            : ""}
                         </span>
                         <Badge className={status.badgeColor + " ml-2"}>
                           {status.label}

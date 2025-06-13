@@ -1,0 +1,349 @@
+{
+  "info": {
+    "_postman_id": "monolith-full-collection-2025",
+    "name": "Monolith API (Auth, Scrum, Report)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Diego Teste\",\n  \"email\": \"diego@example.com\",\n  \"password\": \"12345678\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/register", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"diego@example.com\",\n  \"password\": \"12345678\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/login", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}" },
+            "url": { "raw": "{{baseUrl}}/auth/refresh", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["auth", "refresh"] }
+          }
+        },
+        {
+          "name": "Get Me (User Info)",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/auth/me", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["auth", "me"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Scrum",
+      "item": [
+        {
+          "name": "User Story",
+          "item": [
+            {
+              "name": "Criar User Story",
+              "request": {
+                "method": "POST",
+                "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"title\": \"Minha User Story\",\n  \"status\": \"TODO\",\n  \"sprintId\": \"<SPRINT_ID_AQUI>\"\n}" },
+                "url": { "raw": "{{baseUrl}}/scrum/user-stories", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "user-stories"] }
+              }
+            },
+            {
+              "name": "Listar User Stories",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "{{baseUrl}}/scrum/user-stories", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "user-stories"] }
+              }
+            },
+            {
+              "name": "Buscar User Story por ID",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "{{baseUrl}}/scrum/user-stories/{{userStoryId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "user-stories", "{{userStoryId}}"] }
+              }
+            },
+            {
+              "name": "Atualizar User Story",
+              "request": {
+                "method": "PUT",
+                "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"status\": \"in_progress\"\n}" },
+                "url": { "raw": "{{baseUrl}}/scrum/user-stories/{{userStoryId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "user-stories", "{{userStoryId}}"] }
+              }
+            },
+            {
+              "name": "Deletar User Story",
+              "request": {
+                "method": "DELETE",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "{{baseUrl}}/scrum/user-stories/{{userStoryId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "user-stories", "{{userStoryId}}"] }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Task",
+          "item": [
+            {
+              "name": "Criar Task",
+              "request": {
+                "method": "POST",
+                "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"title\": \"Minha Primeira Task\",\n  \"description\": \"Descrição da task\",\n  \"status\": \"TODO\",\n  \"priority\": \"MEDIUM\",\n  \"type\": \"FEATURE\",\n  \"estimatedTime\": 120,\n  \"userStoryId\": \"{{userStoryId}}\"\n}" },
+                "url": { "raw": "{{baseUrl}}/scrum/tasks", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "tasks"] }
+              }
+            },
+            {
+              "name": "Listar Tasks do Usuário",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "{{baseUrl}}/scrum/tasks?userId={{userId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "tasks"], "query": [ { "key": "userId", "value": "{{userId}}" } ] }
+              }
+            },
+            {
+              "name": "Buscar Task por ID",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "{{baseUrl}}/scrum/tasks/{{taskId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "tasks", "{{taskId}}"] }
+              }
+            },
+            {
+              "name": "Atualizar Task",
+              "request": {
+                "method": "PUT",
+                "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"title\": \"Task Atualizada\",\n  \"status\": \"in_progress\"\n}" },
+                "url": { "raw": "{{baseUrl}}/scrum/tasks/{{taskId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "tasks", "{{taskId}}"] }
+              }
+            },
+            {
+              "name": "Deletar Task",
+              "request": {
+                "method": "DELETE",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "{{baseUrl}}/scrum/tasks/{{taskId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "tasks", "{{taskId}}"] }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Ceremony",
+          "item": [
+            {
+              "name": "Criar Cerimônia",
+              "request": {
+                "method": "POST",
+                "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"type\": \"DAILY\",\n  \"scheduledAt\": \"2025-06-08T10:00:00.000Z\",\n  \"startTime\": \"2025-06-08T10:00:00.000Z\",\n  \"endTime\": \"2025-06-08T10:15:00.000Z\",\n  \"participants\": [\"{{userId}}\"],\n  \"timeLogs\": []\n}" },
+                "url": { "raw": "{{baseUrl}}/scrum/ceremonies", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "ceremonies"] }
+              }
+            },
+            {
+              "name": "Listar Cerimônias",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "{{baseUrl}}/scrum/ceremonies", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "ceremonies"] }
+              }
+            },
+            {
+              "name": "Buscar Cerimônia por ID",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "{{baseUrl}}/scrum/ceremonies/{{ceremonyId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "ceremonies", "{{ceremonyId}}"] }
+              }
+            },
+            {
+              "name": "Atualizar Cerimônia",
+              "request": {
+                "method": "PUT",
+                "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"type\": \"REVIEW\",\n  \"startTime\": \"2025-06-08T11:00:00.000Z\",\n  \"endTime\": \"2025-06-08T11:30:00.000Z\"\n}" },
+                "url": { "raw": "{{baseUrl}}/scrum/ceremonies/{{ceremonyId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "ceremonies", "{{ceremonyId}}"] }
+              }
+            },
+            {
+              "name": "Deletar Cerimônia",
+              "request": {
+                "method": "DELETE",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "{{baseUrl}}/scrum/ceremonies/{{ceremonyId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "ceremonies", "{{ceremonyId}}"] }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sprint",
+          "item": [
+            {
+              "name": "Criar Sprint",
+              "request": {
+                "method": "POST",
+                "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"name\": \"Sprint 1\",\n  \"startDate\": \"2025-06-10T00:00:00.000Z\",\n  \"endDate\": \"2025-06-20T00:00:00.000Z\",\n  \"trimesterId\": \"<TRIMESTER_ID_AQUI>\"\n}" },
+                "url": { "raw": "{{baseUrl}}/scrum/sprints", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "sprints"] }
+              }
+            },
+            {
+              "name": "Listar Sprints",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "{{baseUrl}}/scrum/sprints", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "sprints"] }
+              }
+            },
+            {
+              "name": "Buscar Sprint por ID",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "{{baseUrl}}/scrum/sprints/{{sprintId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "sprints", "{{sprintId}}"] }
+              }
+            },
+            {
+              "name": "Atualizar Sprint",
+              "request": {
+                "method": "PUT",
+                "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"name\": \"Sprint 1 Atualizada\"\n}" },
+                "url": { "raw": "{{baseUrl}}/scrum/sprints/{{sprintId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "sprints", "{{sprintId}}"] }
+              }
+            },
+            {
+              "name": "Deletar Sprint",
+              "request": {
+                "method": "DELETE",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "{{baseUrl}}/scrum/sprints/{{sprintId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "sprints", "{{sprintId}}"] }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Trimester",
+          "item": [
+            {
+              "name": "Criar Trimester",
+              "request": {
+                "method": "POST",
+                "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"year\": 2025,\n  \"number\": 1\n}" },
+                "url": { "raw": "{{baseUrl}}/scrum/trimesters", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "trimesters"] }
+              }
+            },
+            {
+              "name": "Listar Trimesters",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "{{baseUrl}}/scrum/trimesters", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "trimesters"] }
+              }
+            },
+            {
+              "name": "Buscar Trimester por ID",
+              "request": {
+                "method": "GET",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "{{baseUrl}}/scrum/trimesters/{{trimesterId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "trimesters", "{{trimesterId}}"] }
+              }
+            },
+            {
+              "name": "Atualizar Trimester",
+              "request": {
+                "method": "PUT",
+                "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "body": { "mode": "raw", "raw": "{\n  \"year\": 2025,\n  \"number\": 2\n}" },
+                "url": { "raw": "{{baseUrl}}/scrum/trimesters/{{trimesterId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "trimesters", "{{trimesterId}}"] }
+              }
+            },
+            {
+              "name": "Deletar Trimester",
+              "request": {
+                "method": "DELETE",
+                "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+                "url": { "raw": "{{baseUrl}}/scrum/trimesters/{{trimesterId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["scrum", "trimesters", "{{trimesterId}}"] }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Report",
+      "item": [
+        {
+          "name": "Relatório de Tarefas",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/report/tasks?userId={{userId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["report", "tasks"], "query": [ { "key": "userId", "value": "{{userId}}" } ] }
+          }
+        },
+        {
+          "name": "Relatório de Cerimônias",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/report/ceremonies?userId={{userId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["report", "ceremonies"], "query": [ { "key": "userId", "value": "{{userId}}" } ] }
+          }
+        },
+        {
+          "name": "Resumo Geral",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": { "raw": "{{baseUrl}}/report/summary?userId={{userId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["report", "summary"], "query": [ { "key": "userId", "value": "{{userId}}" } ] }
+          }
+        },
+        {
+          "name": "Exportar PDF - Tarefas",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
+            "url": {
+              "raw": "{{baseUrl}}/report/export?userId={{userId}}&type=tasks&format=pdf",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4010",
+              "path": ["report", "export"],
+              "query": [
+                { "key": "userId", "value": "{{userId}}" },
+                { "key": "type", "value": "tasks" },
+                { "key": "format", "value": "pdf" }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4010" },
+    { "key": "token", "value": "" },
+    { "key": "refreshToken", "value": "" },
+    { "key": "userId", "value": "" },
+    { "key": "taskId", "value": "" },
+    { "key": "ceremonyId", "value": "" },
+    { "key": "userStoryId", "value": "" }
+  ]
+}

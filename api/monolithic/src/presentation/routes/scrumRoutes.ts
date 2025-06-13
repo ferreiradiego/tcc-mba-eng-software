@@ -14,63 +14,71 @@ import { validateBody } from "@presentation/middleware/auth/validate";
 import { Router } from "express";
 
 const router = Router();
-
 router.use(authMiddleware);
 
 // Ceremony Routes
-router.get("/", ceremonyController.listCeremonies);
-router.get("/:id", ceremonyController.getCeremony);
-router.post(
+const ceremonyRouter = Router();
+ceremonyRouter.get("/", ceremonyController.listCeremonies);
+ceremonyRouter.get("/:id", ceremonyController.getCeremony);
+ceremonyRouter.post(
   "/",
   validateBody(CeremonySchema),
   ceremonyController.createCeremony
 );
-router.put(
+ceremonyRouter.put(
   "/:id",
   validateBody(CeremonyUpdateSchema),
   ceremonyController.updateCeremony
 );
-router.delete("/:id", ceremonyController.deleteCeremony);
+ceremonyRouter.delete("/:id", ceremonyController.deleteCeremony);
+router.use("/ceremonies", ceremonyRouter);
 
 // Sprint Routes
-router.post("/", sprintController.createSprint);
-router.get("/", sprintController.getSprints);
-router.get("/:id", sprintController.getSprintById);
-router.put("/:id", sprintController.updateSprint);
-router.delete("/:id", sprintController.deleteSprint);
+const sprintRouter = Router();
+sprintRouter.post("/", sprintController.createSprint);
+sprintRouter.get("/", sprintController.getSprints);
+sprintRouter.get("/:id", sprintController.getSprintById);
+sprintRouter.put("/:id", sprintController.updateSprint);
+sprintRouter.delete("/:id", sprintController.deleteSprint);
+router.use("/sprints", sprintRouter);
 
 // Task Routes
-router.get("/", taskController.listTasks);
-router.get("/:id", taskController.getTask);
-router.post("/", validateBody(TaskSchema), taskController.createTask);
-router.put(
+const taskRouter = Router();
+taskRouter.get("/", taskController.listTasks);
+taskRouter.get("/:id", taskController.getTask);
+taskRouter.post("/", validateBody(TaskSchema), taskController.createTask);
+taskRouter.put(
   "/:id",
   validateBody(TaskSchema.partial()),
   taskController.updateTask
 );
-router.delete("/:id", taskController.deleteTask);
+taskRouter.delete("/:id", taskController.deleteTask);
+router.use("/tasks", taskRouter);
 
 // Trimester Routes
-router.post("/", trimesterController.createTrimester);
-router.get("/", trimesterController.getTrimesters);
-router.get("/:id", trimesterController.getTrimesterById);
-router.put("/:id", trimesterController.updateTrimester);
-router.delete("/:id", trimesterController.deleteTrimester);
+const trimesterRouter = Router();
+trimesterRouter.post("/", trimesterController.createTrimester);
+trimesterRouter.get("/", trimesterController.getTrimesters);
+trimesterRouter.get("/:id", trimesterController.getTrimesterById);
+trimesterRouter.put("/:id", trimesterController.updateTrimester);
+trimesterRouter.delete("/:id", trimesterController.deleteTrimester);
+router.use("/trimesters", trimesterRouter);
 
 // User Story Routes
-
-router.get("/", userStoryController.listUserStories);
-router.get("/:id", userStoryController.getUserStory);
-router.post(
+const userStoryRouter = Router();
+userStoryRouter.get("/", userStoryController.listUserStories);
+userStoryRouter.get("/:id", userStoryController.getUserStory);
+userStoryRouter.post(
   "/",
   validateBody(UserStorySchema),
   userStoryController.createUserStory
 );
-router.put(
+userStoryRouter.put(
   "/:id",
   validateBody(UserStorySchema.partial()),
   userStoryController.updateUserStory
 );
-router.delete("/:id", userStoryController.deleteUserStory);
+userStoryRouter.delete("/:id", userStoryController.deleteUserStory);
+router.use("/user-stories", userStoryRouter);
 
 export default router;

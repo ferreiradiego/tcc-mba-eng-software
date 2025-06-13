@@ -1,4 +1,4 @@
-# Scrum App - Monorepo
+# Agile Dev - Monorepo
 
 ![Logo](web/public/logo.png)
 

@@ -6,8 +6,11 @@ import {
   updateSprint,
   deleteSprint,
 } from "../controllers/sprintController";
+import { authMiddleware } from "@presentation/middleware/authMiddleware";
 
 const router = Router();
+
+router.use(authMiddleware);
 
 router.post("/", createSprint);
 router.get("/", getSprints);

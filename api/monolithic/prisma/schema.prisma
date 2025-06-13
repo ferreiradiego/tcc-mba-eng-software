@@ -1,0 +1,127 @@
+// Prisma schema unificado para o monolito
+// Adapte os modelos dos microserviços aqui
+// Exemplo inicial:
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modelos de usuário, sprint, relatório, etc, serão unificados aqui
+// Copie e adapte os modelos dos schemas dos microserviços
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  permissions String[]
+}
+
+model Trimester {
+  id        String   @id @default(uuid())
+  year      Int
+  number    Int
+  sprints   Sprint[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Sprint {
+  id          String      @id @default(uuid())
+  name        String
+  startDate   DateTime
+  endDate     DateTime
+  trimesterId String
+  trimester   Trimester   @relation(fields: [trimesterId], references: [id], onDelete: Cascade)
+  userStories UserStory[]
+  ceremonies  Ceremony[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+enum UserStoryStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+  BLOCKED
+}
+
+model UserStory {
+  id             String          @id @default(uuid())
+  title          String
+  description    String?
+  status         UserStoryStatus
+  activationDate DateTime?
+  sprintCode     String?
+  blocked        Boolean         @default(false)
+  tasks          Task[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  sprintId       String?
+  sprint         Sprint?         @relation(fields: [sprintId], references: [id], onDelete: Cascade)
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+enum TaskType {
+  BUG
+  IMPROVEMENT
+  FEATURE
+  CODE_REVIEW
+}
+
+model Task {
+  id            String     @id @default(uuid())
+  userId        String
+  userStoryId   String?
+  userStory     UserStory? @relation(fields: [userStoryId], references: [id], onDelete: SetNull)
+  title         String
+  description   String?
+  status        TaskStatus
+  type          TaskType
+  dueDate       DateTime?
+  dependencies  String[]
+  estimatedTime Int?
+  startedAt     DateTime?
+  finishedAt    DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+enum CeremonyType {
+  DAILY
+  PLANNING
+  REVIEW
+  RETROSPECTIVE
+  OTHER
+}
+
+model Ceremony {
+  id           String       @id @default(uuid())
+  type         CeremonyType
+  typeDesc     String?
+  scheduledAt  DateTime
+  startTime    DateTime
+  endTime      DateTime
+  duration     Int?
+  participants String[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  sprintId     String?
+  sprint       Sprint?      @relation(fields: [sprintId], references: [id], onDelete: SetNull)
+}

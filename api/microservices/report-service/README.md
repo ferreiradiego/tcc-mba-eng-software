@@ -8,12 +8,12 @@ Microserviço responsável pela geração de relatórios personalizados sobre o 
 
 ## 🚀 Endpoints
 
-| Método | Rota                       | Descrição                        |
-|--------|----------------------------|----------------------------------|
-| GET    | /reports/tasks             | Relatório de tarefas             |
-| GET    | /reports/ceremonies        | Relatório de cerimônias          |
-| GET    | /reports/summary           | Resumo geral                     |
-| GET    | /reports/export            | Exporta relatório (PDF/CSV)      |
+| Método | Rota                | Descrição                   |
+| ------ | ------------------- | --------------------------- |
+| GET    | /reports/tasks      | Relatório de tarefas        |
+| GET    | /reports/ceremonies | Relatório de cerimônias     |
+| GET    | /reports/summary    | Resumo geral                |
+| GET    | /reports/export     | Exporta relatório (PDF/CSV) |
 
 > **Todos os endpoints exigem autenticação via Bearer Token.**
 
@@ -21,7 +21,7 @@ Microserviço responsável pela geração de relatórios personalizados sobre o 
 
 ## 📊 Fluxo de Uso
 
-![Fluxograma de Uso](resources/fluxogram.png)
+![Fluxograma de Uso](resources/report-service-fluxogram.png)
 
 1. O usuário faz login e obtém um token JWT do Auth Service.
 2. Realiza requisições autenticadas para os endpoints de relatório.
@@ -31,6 +31,7 @@ Microserviço responsável pela geração de relatórios personalizados sobre o 
 ---
 
 ## 🎯 Funcionalidades
+
 - Filtragem por período, categoria, projeto e usuário
 - Exportação em PDF/CSV
 - Métricas e gráficos
@@ -89,12 +90,14 @@ Certifique-se de que esses serviços estejam rodando para obter todos os dados n
 ## 📚 Exemplos de Requisição
 
 ### Relatório de Tarefas
+
 ```http
 GET /reports/tasks?userId=123&year=2025&number=2
 Authorization: Bearer <token>
 ```
 
 ### Exportar PDF
+
 ```http
 GET /reports/export?userId=123&type=summary&format=pdf&year=2025&number=2
 Authorization: Bearer <token>
@@ -103,6 +106,7 @@ Authorization: Bearer <token>
 ---
 
 ## 📝 Observações
+
 - O serviço depende de autenticação JWT.
 - Para exportação, utilize os formatos `pdf` ou `csv` no parâmetro `format`.
 - Em caso de erro de formato, consulte `/reports/error/unsupported-format`.
@@ -110,9 +114,11 @@ Authorization: Bearer <token>
 ---
 
 ## 👨‍💻 Contribuição
+
 Pull requests são bem-vindos!
 
 ---
 
 ## 📄 Licença
+
 MIT

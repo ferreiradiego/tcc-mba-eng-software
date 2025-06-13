@@ -11,15 +11,14 @@ const trimesterRepo = new ReportTrimesterRepository();
 
 export async function generatePDFReport(
   userId: string,
-  token: string,
   type: string = "summary",
   trimesterParams?: { year?: number; number?: number }
 ): Promise<Buffer> {
   const [user, tasks, ceremonies, trimesters] = await Promise.all([
-    userRepo.getUserById(userId, token),
-    taskRepo.findAllByUser(userId, token),
-    ceremonyRepo.findAllByUser(userId, token),
-    trimesterRepo.findAll(token),
+    userRepo.getUserById(userId),
+    taskRepo.findAllByUser(userId),
+    ceremonyRepo.findAllByUser(userId),
+    trimesterRepo.findAll(),
   ]);
 
   let trimester = null;

@@ -8,38 +8,30 @@ const ceremonyRepo = new ReportCeremonyRepository();
 
 export async function tasksReport(req: Request, res: Response) {
   const userId = req.query.userId as string;
-  const token = req.headers.authorization?.replace("Bearer ", "") || "";
   const year = req.query.year ? Number(req.query.year) : undefined;
   const number = req.query.number ? Number(req.query.number) : undefined;
   if (!userId) return res.status(400).json({ error: "userId é obrigatório" });
-  const tasks = await taskRepo.findAllByUser(userId, token, year, number);
+  const tasks = await taskRepo.findAllByUser(userId, year, number);
   res.json({ report: "Relatório de tarefas", data: tasks });
 }
 
 export async function ceremoniesReport(req: Request, res: Response) {
   const userId = req.query.userId as string;
-  const token = req.headers.authorization?.replace("Bearer ", "") || "";
   const year = req.query.year ? Number(req.query.year) : undefined;
   const number = req.query.number ? Number(req.query.number) : undefined;
   if (!userId) return res.status(400).json({ error: "userId é obrigatório" });
-  const ceremonies = await ceremonyRepo.findAllByUser(
-    userId,
-    token,
-    year,
-    number
-  );
+  const ceremonies = await ceremonyRepo.findAllByUser(userId, year, number);
   res.json({ report: "Relatório de cerimônias", data: ceremonies });
 }
 
 export async function summaryReport(req: Request, res: Response) {
   const userId = req.query.userId as string;
-  const token = req.headers.authorization?.replace("Bearer ", "") || "";
   const year = req.query.year ? Number(req.query.year) : undefined;
   const number = req.query.number ? Number(req.query.number) : undefined;
   if (!userId) return res.status(400).json({ error: "userId é obrigatório" });
   const [tasks, ceremonies] = await Promise.all([
-    taskRepo.findAllByUser(userId, token, year, number),
-    ceremonyRepo.findAllByUser(userId, token, year, number),
+    taskRepo.findAllByUser(userId, year, number),
+    ceremonyRepo.findAllByUser(userId, year, number),
   ]);
   res.json({
     report: "Resumo geral",

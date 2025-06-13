@@ -6,6 +6,6 @@ export class ReportUserRepository {
   async getUserById(userId: string) {
     const user = await this.userRepo.findById(userId);
     if (user) return user;
-    return { id: userId, name: "Usuário não encontrado" };
+    return { id: userId, name: "Usuário não encontrado", email: "" };
   }
 }

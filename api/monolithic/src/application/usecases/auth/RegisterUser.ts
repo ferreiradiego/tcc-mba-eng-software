@@ -1,4 +1,4 @@
-import { User } from '@domain/entities/User';
+import type { User } from '@domain/entities/auth/User';
 import { z } from 'zod';
 
 export const RegisterUserSchema = z.object({

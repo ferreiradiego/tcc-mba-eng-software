@@ -1,5 +1,6 @@
-import { Ceremony } from "@domain/entities/Ceremony";
-import { PrismaCeremonyRepository } from "@infrastructure/repositories/PrismaCeremonyRepository";
+import type { Ceremony } from "@domain/entities/scrum/Ceremony";
+import { PrismaCeremonyRepository } from "@infrastructure/repositories/scrum/PrismaCeremonyRepository";
+
 
 export class CeremonyService {
   private ceremonyRepo: PrismaCeremonyRepository;

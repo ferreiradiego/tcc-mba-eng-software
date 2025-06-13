@@ -1,6 +1,7 @@
-import { UserStory } from "../../../domain/entities/UserStory";
-import { Sprint } from "../../../domain/entities/Sprint";
-import { Trimester } from "../../../domain/entities/Trimester";
+import { Sprint } from "@domain/entities/scrum/Sprint";
+import { Trimester } from "@domain/entities/scrum/Trimester";
+import { UserStory } from "@domain/entities/scrum/UserStory";
+
 
 export function toUserStory(prismaUserStory: any): UserStory {
   let trimester;

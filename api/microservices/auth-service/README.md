@@ -21,7 +21,7 @@ Microserviço de autenticação e autorização para desenvolvedores, utilizando
 
 ## 📊 Fluxo de Autenticação
 
-![Fluxograma de Uso](resources/auth-service-fluxogram.png)
+![Fluxograma de Uso](resources/auth-service-flowchart.png)
 
 1. O usuário se cadastra ou faz login e recebe um token JWT e um refresh token.
 2. Utiliza o token JWT para acessar endpoints protegidos.

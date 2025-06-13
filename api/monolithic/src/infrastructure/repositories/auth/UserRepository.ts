@@ -1,4 +1,4 @@
-import { User } from "@domain/entities/User";
+import type { User } from "@domain/entities/auth/User";
 
 export interface UserRepository {
   findByEmail(email: string): Promise<User | null>;

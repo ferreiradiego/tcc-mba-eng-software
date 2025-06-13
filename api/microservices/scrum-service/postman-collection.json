@@ -1,0 +1,80 @@
+{
+  "info": {
+    "_postman_id": "scrum-service-collection-2025",
+    "name": "Scrum Service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Coleção de testes para o microserviço de Scrum."
+  },
+  "item": [
+    {
+      "name": "Listar Cerimônias",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/ceremonies",
+          "host": ["{{baseUrl}}"],
+          "path": ["ceremonies"]
+        }
+      }
+    },
+    {
+      "name": "Criar Cerimônia",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+          { "key": "Content-Type", "value": "application/json", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Daily\",\n  \"date\": \"2025-06-12T09:00:00Z\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/ceremonies",
+          "host": ["{{baseUrl}}"],
+          "path": ["ceremonies"]
+        }
+      }
+    },
+    {
+      "name": "Listar Tasks",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/tasks",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks"]
+        }
+      }
+    },
+    {
+      "name": "Criar Task",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" },
+          { "key": "Content-Type", "value": "application/json", "type": "text" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Implementar endpoint\",\n  \"description\": \"Criar endpoint de exemplo\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tasks",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4002" },
+    { "key": "token", "value": "" }
+  ]
+}

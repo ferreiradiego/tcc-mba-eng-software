@@ -21,7 +21,7 @@ Microserviço responsável pela geração de relatórios personalizados sobre o 
 
 ## 📊 Fluxo de Uso
 
-![Fluxograma de Uso](resources/report-service-fluxogram.png)
+![Fluxograma de Uso](resources/report-service-flowchart.png)
 
 1. O usuário faz login e obtém um token JWT do Auth Service.
 2. Realiza requisições autenticadas para os endpoints de relatório.

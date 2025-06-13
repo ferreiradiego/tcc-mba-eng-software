@@ -1,15 +1,22 @@
 import authRoutes from "@presentation/routes/authRoutes";
 import reportRoutes from "@presentation/routes/reportRoutes";
 import scrumRoutes from "@presentation/routes/scrumRoutes";
-import express from "express";
-import { json } from "express";
+import cors from "cors";
+import express, { json } from "express";
 
 const app = express();
 app.use(json());
 
+app.use(
+  cors({
+    origin: [process.env.WEB_APP_URL || "http://localhost:3000"],
+    credentials: true,
+  })
+);
+
 app.use("/auth", authRoutes);
 app.use("/scrum", scrumRoutes);
-app.use("/report", reportRoutes);
+app.use("/reports", reportRoutes);
 
 app.get("/", (req, res) => {
   res.send("Monolithic API is running");

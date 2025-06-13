@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frontend - Scrum App
 
-## Getting Started
+![Logo](public/logo.png)
 
-First, run the development server:
+Aplicação web desenvolvida em Next.js para gestão de times ágeis, tarefas, cerimônias, user stories, sprints e relatórios.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Funcionalidades
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Autenticação de usuários (login, registro, logout)
+- Dashboard com visão geral
+- Gestão de tarefas, user stories, sprints, trimestres e cerimônias
+- Relatórios visuais e exportação
+- Configurações de usuário
+- Interface responsiva e dark mode
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 📊 Estrutura de Telas
 
-To learn more about Next.js, take a look at the following resources:
+- **/auth/register**: Cadastro de usuário
+- **/auth**: Login
+- **/dashboard**: Visão geral
+- **/dashboard/tasks**: Gerenciamento de tarefas
+- **/dashboard/user-stories**: User stories
+- **/dashboard/ceremonies**: Cerimônias Scrum
+- **/dashboard/trimesters**: Trimestres e Sprints
+- **/dashboard/reports**: Relatórios
+- **/dashboard/settings**: Configurações do usuário
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🖼️ Fluxo de Navegação
 
-## Deploy on Vercel
+1. Usuário acessa a tela de login ou cadastro
+2. Após autenticação, é redirecionado ao dashboard
+3. Navega entre tarefas, user stories, cerimônias, sprints, relatórios e configurações
+4. Pode sair a qualquer momento pelo menu lateral
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## ⚙️ Como rodar localmente
+
+1. Instale as dependências:
+   ```sh
+   npm install
+   ```
+2. Configure as variáveis de ambiente em `.env.local`:
+   ```env
+   NEXT_PUBLIC_GATEWAY_URL=http://localhost:4000
+   ```
+3. Inicie o frontend:
+   ```sh
+   npm run dev
+   ```
+4. Acesse [http://localhost:3000](http://localhost:3000)
+
+---
+
+## 🧩 Integração com Microserviços
+
+- **API Gateway**: Todas as requisições passam pelo gateway (`NEXT_PUBLIC_GATEWAY_URL`)
+- **Auth Service**: Autenticação e dados do usuário
+- **Scrum Service**: Tarefas, user stories, sprints, cerimônias
+- **Report Service**: Relatórios e exportação
+
+---
+
+## 📝 Observações
+- O token JWT é salvo no sessionStorage e enviado automaticamente nas requisições.
+- O frontend utiliza React Query, Zod, React Hook Form, TailwindCSS, Radix UI e outros.
+- Para customização visual, edite `tailwind.config.ts` e `globals.css`.
+
+---
+
+## 👨‍💻 Contribuição
+Pull requests são bem-vindos!
+
+---
+
+## 📄 Licença
+MIT

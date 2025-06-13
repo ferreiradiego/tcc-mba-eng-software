@@ -1,0 +1,93 @@
+{
+  "info": {
+    "_postman_id": "report-service-collection-2025",
+    "name": "Report Service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Coleção de testes para o microserviço de relatórios."
+  },
+  "item": [
+    {
+      "name": "Relatório de Tarefas",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/reports/tasks?userId={{userId}}&year=2025&number=2",
+          "host": ["{{baseUrl}}"],
+          "path": ["reports", "tasks"],
+          "query": [
+            { "key": "userId", "value": "{{userId}}" },
+            { "key": "year", "value": "2025" },
+            { "key": "number", "value": "2" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Relatório de Cerimônias",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/reports/ceremonies?userId={{userId}}&year=2025&number=2",
+          "host": ["{{baseUrl}}"],
+          "path": ["reports", "ceremonies"],
+          "query": [
+            { "key": "userId", "value": "{{userId}}" },
+            { "key": "year", "value": "2025" },
+            { "key": "number", "value": "2" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Resumo Geral",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/reports/summary?userId={{userId}}&year=2025&number=2",
+          "host": ["{{baseUrl}}"],
+          "path": ["reports", "summary"],
+          "query": [
+            { "key": "userId", "value": "{{userId}}" },
+            { "key": "year", "value": "2025" },
+            { "key": "number", "value": "2" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Exportar PDF",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}", "type": "text" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/reports/export?userId={{userId}}&type=summary&format=pdf&year=2025&number=2",
+          "host": ["{{baseUrl}}"],
+          "path": ["reports", "export"],
+          "query": [
+            { "key": "userId", "value": "{{userId}}" },
+            { "key": "type", "value": "summary" },
+            { "key": "format", "value": "pdf" },
+            { "key": "year", "value": "2025" },
+            { "key": "number", "value": "2" }
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4003" },
+    { "key": "token", "value": "" },
+    { "key": "userId", "value": "" }
+  ]
+}

@@ -296,7 +296,7 @@
           "request": {
             "method": "GET",
             "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
-            "url": { "raw": "{{baseUrl}}/report/tasks?userId={{userId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["report", "tasks"], "query": [ { "key": "userId", "value": "{{userId}}" } ] }
+            "url": { "raw": "{{baseUrl}}/reports/tasks?userId={{userId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["reports", "tasks"], "query": [ { "key": "userId", "value": "{{userId}}" } ] }
           }
         },
         {
@@ -304,7 +304,7 @@
           "request": {
             "method": "GET",
             "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
-            "url": { "raw": "{{baseUrl}}/report/ceremonies?userId={{userId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["report", "ceremonies"], "query": [ { "key": "userId", "value": "{{userId}}" } ] }
+            "url": { "raw": "{{baseUrl}}/reports/ceremonies?userId={{userId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["reports", "ceremonies"], "query": [ { "key": "userId", "value": "{{userId}}" } ] }
           }
         },
         {
@@ -312,7 +312,7 @@
           "request": {
             "method": "GET",
             "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
-            "url": { "raw": "{{baseUrl}}/report/summary?userId={{userId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["report", "summary"], "query": [ { "key": "userId", "value": "{{userId}}" } ] }
+            "url": { "raw": "{{baseUrl}}/reports/summary?userId={{userId}}", "protocol": "http", "host": ["localhost"], "port": "4010", "path": ["reports", "summary"], "query": [ { "key": "userId", "value": "{{userId}}" } ] }
           }
         },
         {
@@ -321,11 +321,11 @@
             "method": "GET",
             "header": [ { "key": "Authorization", "value": "Bearer {{token}}" } ],
             "url": {
-              "raw": "{{baseUrl}}/report/export?userId={{userId}}&type=tasks&format=pdf",
+              "raw": "{{baseUrl}}/reports/export?userId={{userId}}&type=tasks&format=pdf",
               "protocol": "http",
               "host": ["localhost"],
               "port": "4010",
-              "path": ["report", "export"],
+              "path": ["reports", "export"],
               "query": [
                 { "key": "userId", "value": "{{userId}}" },
                 { "key": "type", "value": "tasks" },

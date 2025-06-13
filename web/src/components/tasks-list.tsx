@@ -114,8 +114,9 @@ export default function TasksList() {
     const typeMatch = typeFilter === "ALL" || task.type === typeFilter;
     const usMatch =
       usFilter === "ALL" || (task.userStory?.title || "Sem US") === usFilter;
-    const startedDate = task.startedAt ? new Date(task.startedAt) : null;
+    const startedDate = task.dueDate ? new Date(task.dueDate) : null;
     let dateMatch = true;
+
     if (dateRange.from && dateRange.to && startedDate) {
       dateMatch =
         (isSameDay(startedDate, dateRange.from) ||

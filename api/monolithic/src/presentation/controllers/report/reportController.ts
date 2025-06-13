@@ -54,7 +54,7 @@ export async function exportReport(req: Request, res: Response) {
   if (!userId) return res.status(400).json({ error: "userId é obrigatório" });
   if (format === "pdf") {
     try {
-      const pdfBuffer = await generatePDFReport(userId, token, type, {
+      const pdfBuffer = await generatePDFReport(userId, type, {
         year,
         number,
       });

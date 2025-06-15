@@ -64,6 +64,9 @@ api/
 
 ## 🔄 Fluxos
 
+![Fluxograma do Gateway](resources/api-flowchart.png)
+
+
 ### Autenticação
 
 1. O usuário se cadastra ou faz login e recebe um token JWT e um refresh token.

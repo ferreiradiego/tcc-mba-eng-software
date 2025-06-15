@@ -29,6 +29,39 @@ Gateway responsável pelo roteamento centralizado das requisições entre os mic
 
 ---
 
+## Fluxograma detalhado do monólito com autenticação obrigatória
+
+```mermaid
+flowchart TD
+    A[Usuário] --> B[API Monolítica]
+    B --> C[Autenticação]
+    C -->|Login/Cadastro| D[Valida Usuário e Senha]
+    D -->|Sucesso| E[Retorna Token]
+    D -->|Falha| F[Erro de Autenticação]
+    E --> G[Gestão de User Stories]
+    E --> H[Geração de Relatórios]
+    G --> I[Criação/Atualização de User Story]
+    G --> J[Gestão de Tasks]
+    J --> K[Criação/Atualização de Task]
+    G --> L[Gestão de Sprints]
+    L --> M[Criação/Atualização de Sprint]
+    G --> N[Gestão de Cerimônias]
+    N --> O[Criação/Atualização de Cerimônia]
+    H --> P[Consulta Dados]
+    P --> Q[Gera Relatório PDF/JSON]
+    Q --> R[Retorna Relatório ao Usuário]
+    C --> S[(Banco de Dados)]
+    I --> S
+    K --> S
+    M --> S
+    O --> S
+    P --> S
+```
+
+> Vale lembrar que os relatórios não são salvos no banco de dados, apenas gerados sob demanda e retornados ao usuário.
+
+---
+
 ## 🎯 Funcionalidades
 - Roteamento centralizado para todos os microserviços
 - Validação de autenticação JWT

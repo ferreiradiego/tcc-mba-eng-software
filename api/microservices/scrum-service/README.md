@@ -33,8 +33,6 @@ Microserviço responsável pelo gerenciamento de tarefas, cerimônias, sprints, 
 2. O Scrum Service valida o token junto ao Auth Service.
 3. O serviço executa operações de CRUD no banco de dados.
 4. O usuário recebe os dados ou confirmações das operações.
-5. O Scrum Service pode notificar outros serviços, como o Report Service, quando necessário.
-
 ---
 
 ## 🎯 Funcionalidades

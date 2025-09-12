@@ -10,9 +10,7 @@ export class PrismaCeremonyRepository implements CeremonyRepository {
     number?: number
   ): Promise<Ceremony[]> {
     let where: any = {};
-    if (userId) {
-      where.participants = { has: userId };
-    }
+
     if (year && number) {
       const sprints = await prisma.sprint.findMany({
         where: {

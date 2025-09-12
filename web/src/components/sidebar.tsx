@@ -9,15 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import {
-  FileText,
-  Home,
-  ListChecks,
-  LogOut,
-  Settings,
-  User2,
-  Users,
-} from "lucide-react";
+import { FileText, Home, ListChecks, LogOut, User2, Users } from "lucide-react";
 import Link from "next/link";
 import { Logo } from "./logo";
 

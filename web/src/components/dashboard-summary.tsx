@@ -235,12 +235,6 @@ export default function DashboardSummary() {
             <span className="text-sm">Cerimônias</span>
           </div>
         </Card>
-        <Card className="rounded-lg p-6 shadow flex flex-col items-center justify-center bg-green-50 dark:bg-green-950">
-          <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-            <span className="font-bold text-2xl">{statusMap.length}</span>{" "}
-            <span className="text-sm">Status de Tarefas</span>
-          </div>
-        </Card>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="p-4 flex flex-col items-center">

@@ -1,6 +1,7 @@
 import { TaskDialogForm } from "@/components/task-dialog-form";
 import TasksList from "@/components/tasks-list";
 import { Card } from "@/components/ui/card";
+import { Suspense } from "react";
 
 export default function TasksPage() {
   return (
@@ -10,7 +11,9 @@ export default function TasksPage() {
         <TaskDialogForm />
       </div>
       <Card className="p-4">
-        <TasksList />
+        <Suspense fallback={<div>Carregando tarefas...</div>}>
+          <TasksList />
+        </Suspense>
       </Card>
     </div>
   );

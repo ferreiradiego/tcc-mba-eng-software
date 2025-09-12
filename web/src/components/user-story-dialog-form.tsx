@@ -43,7 +43,7 @@ export function UserStoryDialogForm({
   const isEdit = !!userStory;
   const [open, setOpen] = useState(false);
   const { createUserStory, updateUserStory } = useUserStories();
-  const { sprints, loading: loadingSprints } = useSprints();
+  const { sprints } = useSprints();
   const methods = useForm<UserStoryForm>({
     resolver: zodResolver(UserStorySchema),
     defaultValues: userStory

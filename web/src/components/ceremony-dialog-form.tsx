@@ -14,7 +14,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Ceremony, useCeremonies } from "@/hooks/use-ceremonies";
-import { useSprints } from "@/hooks/use-sprints";
+import { useSprints, Sprint } from "@/hooks/use-sprints";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, PlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -71,19 +71,15 @@ function getCeremonyDefaultValues(ceremony?: Ceremony): Partial<CeremonyForm> {
       endTime: "",
     };
   }
-  const parseTime = (val: any) => {
+  const parseTime = (val: unknown) => {
     if (!val || val === "1970-01-01T00:00:00.000Z") return "";
-    if (
-      Object.prototype.toString.call(val) === "[object Date]" &&
-      val.getTime() === 0
-    )
-      return "";
+    if (val instanceof Date) {
+      if (isNaN(val.getTime()) || val.getTime() === 0) return "";
+      return toBrazilianTime(val);
+    }
     if (typeof val === "string") {
       if (/^\d{2}:\d{2}$/.test(val.slice(11, 16))) return val.slice(11, 16);
       if (/^\d{2}:\d{2}$/.test(val)) return val;
-      return toBrazilianTime(val);
-    }
-    if (Object.prototype.toString.call(val) === "[object Date]") {
       return toBrazilianTime(val);
     }
     return "";
@@ -123,6 +119,7 @@ export function CeremonyDialogForm({
       setOpen(true);
       methods.reset(getCeremonyDefaultValues(ceremony));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ceremony]);
 
   const selectedType = methods.watch("type");
@@ -161,6 +158,7 @@ export function CeremonyDialogForm({
       startTime,
       endTime,
       sprintId: data.sprintId || undefined,
+      participants: data.participants ?? [],
     };
     if (isEdit && ceremony) {
       await updateCeremony({ id: ceremony.id, data: payload });
@@ -240,9 +238,13 @@ export function CeremonyDialogForm({
                 options={
                   loadingSprints
                     ? []
-                    : sprints.map((s: any) => ({
+                    : sprints.map((s: Sprint) => ({
                         value: s.id,
-                        label: `${s.name} (${new Date(s.startDate).toLocaleDateString()} - ${new Date(s.endDate).toLocaleDateString()})`,
+                        label: `${s.name} (${new Date(
+                          s.startDate
+                        ).toLocaleDateString()} - ${new Date(
+                          s.endDate
+                        ).toLocaleDateString()})`,
                       }))
                 }
                 required={false}

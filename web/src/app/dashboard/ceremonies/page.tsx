@@ -1,6 +1,7 @@
 import CeremoniesList from "@/components/ceremonies-list";
 import { CeremonyDialogForm } from "@/components/ceremony-dialog-form";
 import { Card } from "@/components/ui";
+import { Suspense } from "react";
 
 export default function CeremoniesPage() {
   return (
@@ -10,7 +11,9 @@ export default function CeremoniesPage() {
         <CeremonyDialogForm />
       </div>
       <Card className="p-4">
-        <CeremoniesList />
+        <Suspense fallback={<div>Carregando cerimônias...</div>}>
+          <CeremoniesList />
+        </Suspense>
       </Card>
     </div>
   );

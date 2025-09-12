@@ -47,8 +47,6 @@ export type TaskForm = {
   dueDate?: Date;
   type?: string;
   estimatedTime?: number;
-  // startedAt e finishedAt removidos do form, pois são setados pelo backend
-  // dependencies?: string[]; // descomente se for usar no form
 };
 
 export function useTasks() {
@@ -83,7 +81,7 @@ export function useTasks() {
   });
 
   const updateTaskMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+    mutationFn: async ({ id, data }: { id: string; data: TaskForm }) => {
       await api.put(`/scrum/tasks/${id}`, data);
     },
     onSuccess: () => {

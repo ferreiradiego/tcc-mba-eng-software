@@ -38,12 +38,20 @@ export default function RegisterPage() {
       setSuccess("Usuário cadastrado com sucesso! Redirecionando...");
       await loginUser({ email: data.email, password: data.password });
       router.replace("/dashboard");
-    } catch (err: any) {
-      setError(
-        err?.response?.data?.message ||
-          err.message ||
-          "Erro ao cadastrar usuário"
-      );
+    } catch (err: unknown) {
+      if (typeof err === "object" && err !== null) {
+        const errorObj = err as {
+          response?: { data?: { message?: string } };
+          message?: string;
+        };
+        setError(
+          errorObj?.response?.data?.message ||
+            errorObj?.message ||
+            "Erro ao cadastrar usuário"
+        );
+      } else {
+        setError("Erro ao cadastrar usuário");
+      }
     } finally {
       setLoading(false);
     }

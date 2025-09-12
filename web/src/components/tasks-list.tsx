@@ -30,7 +30,6 @@ import {
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
-  CalendarDays,
   CheckCircle2,
   Clock,
   FilePen,

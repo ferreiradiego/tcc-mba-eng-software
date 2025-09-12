@@ -54,9 +54,10 @@ export function TaskDialogForm({
           ...task,
           dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
           userStoryId:
-            (task as any).userStoryId ||
-            (task as any).userStory?.id ||
-            undefined,
+            "userStoryId" in task && typeof task.userStoryId === "string"
+              ? task.userStoryId
+              : (task as { userStory?: { id?: string } }).userStory?.id ||
+                undefined,
         }
       : {
           status: TaskStatus.TODO,

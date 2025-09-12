@@ -69,7 +69,7 @@ export function useCeremonies() {
   });
 
   const updateCeremonyMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+    mutationFn: async ({ id, data }: { id: string; data: CeremonyForm }) => {
       await api.put(`/scrum/ceremonies/${id}`, data);
     },
     onSuccess: () => {

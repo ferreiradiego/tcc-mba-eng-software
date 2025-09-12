@@ -17,7 +17,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useReportApi } from "@/hooks/use-report-api";
-import { useTrimesters } from "@/hooks/use-trimesters";
+import { Trimester, useTrimesters } from "@/hooks/use-trimesters";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -50,6 +50,20 @@ function formatDate(date: Date) {
   return date.toISOString().split("T")[0];
 }
 
+type Task = {
+  id: string;
+  title?: string;
+  name?: string;
+  status?: string;
+  createdAt?: string;
+};
+
+type Ceremony = {
+  id: string;
+  type: string;
+  scheduledAt?: string;
+};
+
 export default function DashboardSummary() {
   const { user, isLoading: userLoading } = useCurrentUser();
   const { trimesters, loading: loadingTrimesters } = useTrimesters();
@@ -67,9 +81,9 @@ export default function DashboardSummary() {
   const dateFrom = formatDate(dateFromObj);
   const dateTo = formatDate(dateToObj);
 
-  const selectedTrimesterObj = useMemo(() => {
+  const selectedTrimesterObj: Trimester | undefined = useMemo(() => {
     return (
-      trimesters.find((t) => t.id === selectedTrimester) ||
+      trimesters.find((t: Trimester) => t.id === selectedTrimester) ||
       trimesters[trimesters.length - 1]
     );
   }, [selectedTrimester, trimesters]);
@@ -80,18 +94,18 @@ export default function DashboardSummary() {
     selectedTrimesterObj?.number
   );
 
-  const filteredTasks = useMemo(() => {
+  const filteredTasks: Task[] = useMemo(() => {
     if (!summary.data?.data.tasks) return [];
-    return summary.data.data.tasks.filter((t: any) => {
+    return (summary.data.data.tasks as Task[]).filter((t) => {
       if (!t.createdAt) return true;
       const d = new Date(t.createdAt);
       return d >= new Date(dateFrom) && d <= new Date(dateTo);
     });
   }, [summary.data, dateFrom, dateTo]);
 
-  const filteredCeremonies = useMemo(() => {
+  const filteredCeremonies: Ceremony[] = useMemo(() => {
     if (!summary.data?.data.ceremonies) return [];
-    return summary.data.data.ceremonies.filter((c: any) => {
+    return (summary.data.data.ceremonies as Ceremony[]).filter((c) => {
       if (!c.scheduledAt) return true;
       const d = new Date(c.scheduledAt);
       return d >= new Date(dateFrom) && d <= new Date(dateTo);
@@ -100,7 +114,7 @@ export default function DashboardSummary() {
 
   const tasksByDay = useMemo(() => {
     const map: Record<string, number> = {};
-    filteredTasks.forEach((t: any) => {
+    filteredTasks.forEach((t) => {
       const d = t.createdAt ? formatDate(new Date(t.createdAt)) : "";
       if (d) map[d] = (map[d] || 0) + 1;
     });
@@ -109,7 +123,7 @@ export default function DashboardSummary() {
 
   const statusMap = useMemo(() => {
     const map: Record<string, number> = {};
-    filteredTasks.forEach((t: any) => {
+    filteredTasks.forEach((t) => {
       const status = t.status || "Outro";
       map[status] = (map[status] || 0) + 1;
     });
@@ -123,7 +137,7 @@ export default function DashboardSummary() {
     { name: "Cerimônias", value: totalCeremonies },
   ];
 
-  const taskRows = filteredTasks.slice(0, 5).map((t: any) => (
+  const taskRows = filteredTasks.slice(0, 5).map((t) => (
     <tr key={t.id} className="border-b">
       <td className="px-2 py-1 text-sm">{t.title || t.name || t.id}</td>
       <td className="px-2 py-1 text-xs text-muted-foreground">
@@ -135,7 +149,7 @@ export default function DashboardSummary() {
     </tr>
   ));
 
-  const ceremonyRows = filteredCeremonies.slice(0, 5).map((c: any) => (
+  const ceremonyRows = filteredCeremonies.slice(0, 5).map((c) => (
     <tr key={c.id} className="border-b">
       <td className="px-2 py-1 text-sm">{c.type}</td>
       <td className="px-2 py-1 text-xs text-muted-foreground">

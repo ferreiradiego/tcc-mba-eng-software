@@ -11,13 +11,18 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useSprints } from "@/hooks/use-sprints";
-import { useTrimesters } from "@/hooks/use-trimesters";
+import { useSprints, Sprint } from "@/hooks/use-sprints";
+import { useTrimesters, Trimester } from "@/hooks/use-trimesters";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Edit2, Plus, PlusIcon, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+
+type ErrorMessage = {
+  response?: { data?: { message?: string } };
+  message?: string;
+};
 
 export default function TrimestersSprintsPage() {
   const [openTrimester, setOpenTrimester] = useState(false);
@@ -25,8 +30,8 @@ export default function TrimestersSprintsPage() {
   const [loadingTrimester, setLoadingTrimester] = useState(false);
   const [loadingSprint, setLoadingSprint] = useState(false);
   const [loadingDelete, setLoadingDelete] = useState(false);
-  const [editTrimester, setEditTrimester] = useState<any | null>(null);
-  const [editSprint, setEditSprint] = useState<any | null>(null);
+  const [editTrimester, setEditTrimester] = useState<Trimester | null>(null);
+  const [editSprint, setEditSprint] = useState<Sprint | null>(null);
 
   const {
     trimesters,
@@ -36,14 +41,7 @@ export default function TrimestersSprintsPage() {
     deleteTrimester,
     updateTrimester,
   } = useTrimesters();
-  const {
-    sprints,
-    createSprint,
-    deleteSprint,
-    updateSprint,
-    loading: loadingSprints,
-    error: errorSprints,
-  } = useSprints();
+  const { sprints, createSprint, deleteSprint, updateSprint } = useSprints();
 
   async function handleTrimester(data: { year: number; number: number }) {
     setLoadingTrimester(true);
@@ -51,10 +49,11 @@ export default function TrimestersSprintsPage() {
       await createTrimester(data);
       toast("Trimestre cadastrado! Agora cadastre sprints.");
       setOpenTrimester(false);
-    } catch (err: any) {
+    } catch (err) {
+      const error = err as ErrorMessage;
       toast.error(
-        err?.response?.data?.message ||
-          err.message ||
+        error?.response?.data?.message ||
+          error?.message ||
           "Erro ao cadastrar trimestre",
         {}
       );
@@ -72,10 +71,11 @@ export default function TrimestersSprintsPage() {
       await createSprint({ ...data, trimesterId });
       toast("Sprint cadastrada com sucesso!");
       setOpenSprint(null);
-    } catch (err: any) {
+    } catch (err) {
+      const error = err as ErrorMessage;
       toast.error(
-        err?.response?.data?.message ||
-          err.message ||
+        error?.response?.data?.message ||
+          error?.message ||
           "Erro ao cadastrar sprint"
       );
     } finally {
@@ -90,10 +90,11 @@ export default function TrimestersSprintsPage() {
       await updateTrimester({ id: editTrimester.id, data });
       toast("Trimestre atualizado!");
       setEditTrimester(null);
-    } catch (err: any) {
+    } catch (err) {
+      const error = err as ErrorMessage;
       toast.error(
-        err?.response?.data?.message ||
-          err.message ||
+        error?.response?.data?.message ||
+          error?.message ||
           "Erro ao editar trimestre"
       );
     } finally {
@@ -115,9 +116,12 @@ export default function TrimestersSprintsPage() {
       });
       toast("Sprint atualizada!");
       setEditSprint(null);
-    } catch (err: any) {
+    } catch (err) {
+      const error = err as ErrorMessage;
       toast.error(
-        err?.response?.data?.message || err.message || "Erro ao editar sprint"
+        error?.response?.data?.message ||
+          error?.message ||
+          "Erro ao editar sprint"
       );
     } finally {
       setLoadingSprint(false);
@@ -129,10 +133,11 @@ export default function TrimestersSprintsPage() {
     try {
       await deleteTrimester(id);
       toast("Trimestre deletado com sucesso!");
-    } catch (err: any) {
+    } catch (err) {
+      const error = err as ErrorMessage;
       toast.error(
-        err?.response?.data?.message ||
-          err.message ||
+        error?.response?.data?.message ||
+          error?.message ||
           "Erro ao deletar trimestre"
       );
     } finally {
@@ -180,7 +185,7 @@ export default function TrimestersSprintsPage() {
             <TrimesterForm
               onSubmit={handleEditTrimester}
               loading={loadingTrimester}
-              initialValues={editTrimester}
+              initialValues={editTrimester ?? undefined}
             />
           </DialogContent>
         </Dialog>
@@ -224,7 +229,7 @@ export default function TrimestersSprintsPage() {
         <div className="text-gray-500">Nenhum trimestre cadastrado.</div>
       ) : (
         <ul className="space-y-4">
-          {trimesters.map((t: any) => (
+          {trimesters.map((t: Trimester) => (
             <li key={t.id} className="border rounded p-3 bg-muted">
               <div className="flex items-center justify-between">
                 <div className="font-semibold">
@@ -273,12 +278,12 @@ export default function TrimestersSprintsPage() {
               </div>
               {/* Sprints List UX */}
               <div className="mt-2">
-                {sprints.filter((s: any) => s.trimesterId === t.id).length >
+                {sprints.filter((s: Sprint) => s.trimesterId === t.id).length >
                 0 ? (
                   <div className="grid grid-cols-1 gap-2">
                     {sprints
-                      .filter((s: any) => s.trimesterId === t.id)
-                      .map((s: any) => (
+                      .filter((s: Sprint) => s.trimesterId === t.id)
+                      .map((s: Sprint) => (
                         <div
                           key={s.id}
                           className="rounded border bg-white p-2 flex items-center justify-between shadow-sm"
@@ -314,10 +319,11 @@ export default function TrimestersSprintsPage() {
                                 try {
                                   await deleteSprint(s.id);
                                   toast("Sprint deletada!");
-                                } catch (err: any) {
+                                } catch (err) {
+                                  const error = err as ErrorMessage;
                                   toast.error(
-                                    err?.response?.data?.message ||
-                                      err.message ||
+                                    error?.response?.data?.message ||
+                                      error?.message ||
                                       "Erro ao deletar sprint"
                                   );
                                 } finally {
@@ -352,7 +358,7 @@ export default function TrimestersSprintsPage() {
           <SprintForm
             onSubmit={handleEditSprint}
             loading={loadingSprint}
-            initialValues={editSprint}
+            initialValues={editSprint ?? undefined}
           />
         </DialogContent>
       </Dialog>
